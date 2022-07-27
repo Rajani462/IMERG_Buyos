@@ -17,19 +17,21 @@ pacf_tao_imrg <- readRDS("./data/pacf_tao_imrg.rds")
 ### preprocess
 
 ind <- ind_rama_imrg[, .(lat, lon, date, imrg_e, imrg_l, imrg_f, buyos = ind_rama, sname,
-                         ocn = factor("ind"))]
+                         ocn = factor("Indian"))]
 
 atln <- atln_pirata_imrg[, .(lat, lon, date, imrg_e, imrg_l, imrg_f, buyos = atln_pirata,
-                             sname, ocn = factor("atln"))]
+                             sname, ocn = factor("Atlantic"))]
 
 pacf <- pacf_tao_imrg[, .(lat, lon, date, imrg_e, imrg_l, imrg_f, buyos = pacf_tao, sname, 
                           ocn = factor("pacf"))]
 
-pacf$ocn <- with(pacf_tao_imrg, ifelse(lon < 0, "east_pacf", "west_pacf"))
+pacf$ocn <- with(pacf_tao_imrg, ifelse(lon < 0, "East Pacific", "West Pacific"))
 
 ind_atln_pacf <- rbind(ind, atln, pacf)
+setnames(ind_atln_pacf, c("imrg_e", "imrg_l", "imrg_f"), c("IMERG-E", "IMERG-L", "IMERG-F"))
+
 ind_atln_pacf_mean <- ind_atln_pacf[, lapply(.SD, mean, na.rm=TRUE), by = .(date, ocn), 
-                                    .SDcols=c("imrg_e", "imrg_l", "imrg_f", "buyos")]
+                                    .SDcols=c("IMERG-E", "IMERG-L", "IMERG-F", "buyos")]
 
 ind_alt_pacf_meanplot <- melt(ind_atln_pacf_mean, c("date", 'ocn', 'buyos'), value.name = "imrg_rf")
 
@@ -46,8 +48,9 @@ stat_met2 <- as_tibble(stat_met) %>% group_by(variable) %>%
 
 # plots -------------------------------------------------------------------
 
-levels(ind_alt_pacf_meanplot$variable) <- c("IMERG-E", "IMERG-L", "IMERG-F")
-levels(ind_alt_pacf_meanplot$ocn) <- c("Indian", "Atlantic", "East Pacific", "West Pacific")
+# levels(ind_alt_pacf_meanplot$variable) <- c("IMERG-E", "IMERG-L", "IMERG-F")
+# levels(ind_alt_pacf_meanplot$ocn) <- c("Indian", "Atlantic", "East Pacific", "West Pacific")
+
 
 ### only for hit days (precipitation >= 0.1)
 
