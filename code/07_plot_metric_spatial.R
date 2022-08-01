@@ -43,8 +43,8 @@ met_latlon <- setnames(met_latlon, c("bias", "rmse", "mae"), c("BIAS", "RMSE", "
 # categeoriacal -----------------------------------------------------------
 
 
-cat_met <- met_latlon[imrg_run == 'imrg_f', .(lat, lon, POD, FAR, CSI)]
-plot_cat_met <- melt(cat_met, c("lat", "lon"))
+cat_met <- met_latlon[imrg_run == 'imrg_f', .(lat, lon, POD, FAR, CSI, ocn)]
+plot_cat_met <- melt(cat_met, c("lat", "lon", "ocn"))
 
 
 ggplot(plot_cat_met)+
@@ -60,19 +60,21 @@ ggplot(plot_cat_met)+
 
 ggplot(plot_cat_met)+
   geom_point(aes(lon, lat, color = value), size = 0.9) +
-  coord_sf( ylim = c(-25, 25)) + 
+  coord_sf(ylim = c(-25, 25)) + 
   # coord_sf(ylim = c(-25, 25), expand = FALSE) + 
   facet_wrap(~variable, ncol = 1) + 
   geom_polygon(data = name_shp, 
                aes(x = long, y = lat, group = group), fill="#979797", color="white") + 
   scale_color_gradientn(name = "value", breaks =  c(0.1, 0.3, 0.5, 0.7, 0.9),
-                       colours=c("green","orange", "red", "blue"), limits = c(0.07, 0.98)) +
-  # scale_color_gradientn(name = "value" ,colours = rainbow(5)) + 
+                       colours=c("green","orange", "red", "blue"), limits = c(0.07, 0.98)) + 
+  # scale_color_gradientn(name = "value", breaks =  c(0.1, 0.3, 0.5, 0.7, 0.9),
+  #                       colours=c("blue","green", "brown", "goldenrod", "red"), limits = c(0.07, 0.98)) +
+  # # scale_color_gradientn(name = "value" ,colours = rainbow(5)) + 
   #theme_small + 
   theme_generic + # for presentation 
   theme(strip.background = element_rect(fill = "white"), 
         strip.text = element_text(colour = 'Black'), 
-        strip.text.x = element_text(size = 14)) + 
+        strip.text.x = element_text(size = 12)) + 
   theme(axis.title.y = element_blank(),
         axis.title.x = element_blank()) + 
   theme(legend.position = "bottom", legend.key.width = unit(2.3, "cm"), 
@@ -107,33 +109,43 @@ plt_bias <- ggplot(vol_df$BIAS)+
   theme_generic + 
   theme(strip.background = element_rect(fill = "white"), 
         strip.text = element_text(colour = 'Black'), 
-        strip.text.x = element_text(size = 14)) +
+        strip.text.x = element_text(size = 12)) +
   theme(legend.position = "right", legend.direction = "vertical") +  # for presentation
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
         legend.title = element_blank())
 
 
- p1 <- plt_bias + scale_colour_stepsn(colours = c("green","orange", "red", "blue"),
+ p1 <- plt_bias + scale_colour_stepsn(colours = c("green", "orange", "red", "blue"),
                          limits = c(-0.3, 13.1),
                          guide = guide_coloursteps(even.steps = TRUE,
-                                                   show.limits = TRUE),
+                                                   show.limits = FALSE),
                          breaks = c(0, 2, 4, 8, 10))
 
+ 
+ # plt_bias + scale_colour_stepsn(colours = c("orange", "#543005", "#80cdc1", "#003c30"),
+ #                                limits = c(-0.3, 13.1),
+ #                                guide = guide_coloursteps(even.steps = TRUE,
+ #                                                          show.limits = TRUE),
+ #                                breaks = c(0, 1, 2, 4, 8, 10))
+ 
+ # ggsave("results/paper_fig/Bias_spatial.png",
+ #        width = 7.6, height = 5.3, units = "in", dpi = 600)
+ 
 # # do it for each "facet"
 plt_rmse <- plt_bias %+% vol_df$RMSE
 p2 <- plt_rmse + scale_colour_stepsn(colours = c("green","orange", "red", "blue"),
                                limits = c(0.6, 31.5),
                                guide = guide_coloursteps(even.steps = TRUE,
-                                                         show.limits = TRUE),
-                               breaks = c(3, 6, 10, 15, 20))
+                                                         show.limits = FALSE),
+                               breaks = c(5, 10, 15, 20, 25, 30))
 
 plt_mae <- plt_bias %+% vol_df$MAE
 p3 <- plt_mae + scale_colour_stepsn(colours = c("green","orange", "red", "blue"),
                                      limits = c(0.1, 13.1),
                                      guide = guide_coloursteps(even.steps = TRUE,
-                                                               show.limits = TRUE),
-                                     breaks = c(1, 2, 4, 6, 8))
+                                                               show.limits = FALSE),
+                                     breaks = c(2, 4, 6, 8, 10))
 
 
 
