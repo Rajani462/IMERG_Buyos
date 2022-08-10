@@ -2,6 +2,7 @@
 source('./source/libs.R')
 source('./source/themes.R')
 source('./source/palettes.R')
+source('./source/functions.R')
 
 library(viridis)
 library(rnaturalearth)
