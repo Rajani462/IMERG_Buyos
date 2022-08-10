@@ -56,90 +56,111 @@ met_latlon[ocn == "pacf", ocn := factor("west_pacf")]
 cat_met <- met_latlon[imrg_run == 'imrg_f', .(lat, lon, POD, FAR, CSI, ocn)]
 plot_cat_met <- melt(cat_met, c("lat", "lon", "ocn"))
 
+cat_df <- split(plot_cat_met, f = plot_cat_met$variable)
 
-cat_df2 <- split(plot_cat_met, f = plot_cat_met$ocn)
 
-### plot
+### pod
 
-ind2 <- ggplot(cat_df2$ind)+
-  geom_point(aes(lon, lat, color = value), size = 2.0) +
-  facet_wrap(~variable) + 
+ind_pod <- ggplot(cat_df$POD)+
+  geom_point(aes(lon, lat, color = value), size = 1.5) +
+  #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_gradientn(name = "value", breaks =  c(0.1, 0.3, 0.5, 0.7, 0.9),
-                        colours=c("green","orange", "red", "blue"), limits = c(0.07, 0.98)) +
+  scale_color_gradientn(name = "POD", breaks =  c(0.1, 0.3, 0.5, 0.7, 0.9),
+                        colours=c("green","orange", "red", "blue"), limits = c(0, 1)) +
+  ggtitle("Indian") + 
   theme_small + 
-  theme(strip.background = element_rect(fill = "white"), 
-        strip.text = element_text(colour = 'Black'), 
-        axis.title.y = element_blank(), 
+  theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
-        legend.position = "none")
+        axis.text.x=element_blank(), 
+        legend.position = "none", plot.title = element_text(hjust = 0.5))
 
+atln_pod <- ind_pod + coord_sf(ylim = c(-20, 20), xlim = c(-45, 0)) + ggtitle("Atlantic") + 
+  theme(axis.text.y=element_blank())
+east_pod <- atln_pod + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) + ggtitle("East Pacific") 
+# theme(axis.text.x=element_text(color=c("black","transparent","black","transparent",
+#                                        "black","transparent","black","transparent","black")))
 
-atln2 <- ggplot(cat_df2$atln)+
-  geom_point(aes(lon, lat, color = value), size = 2.0) +
-  facet_wrap(~variable) + 
-  geom_sf(data = shp, fill="#979797", color="white") + 
-  coord_sf(ylim = c(-20, 20), xlim = c(-45, 0)) + 
-  scale_color_gradientn(name = "value", breaks =  c(0.1, 0.3, 0.5, 0.7, 0.9),
-                        colours=c("green","orange", "red", "blue"), limits = c(0.07, 0.98)) +
-  theme_small + 
-  theme(strip.background = element_blank(), 
-        strip.text = element_blank(), 
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(), 
-        legend.position = "none") 
-
-
-east2 <- ggplot(cat_df2$east_pacf)+
-  geom_point(aes(lon, lat, color = value), size = 2.0) +
-  facet_wrap(~variable) + 
-  geom_sf(data = shp, fill="#979797", color="white") + 
-  coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) +  
-  scale_color_gradientn(name = "value", breaks =  c(0.1, 0.3, 0.5, 0.7, 0.9),
-                        colours=c("green","orange", "red", "blue"), limits = c(0.07, 0.98)) +
-  theme_small + 
-  theme(strip.background = element_blank(), 
-        strip.text = element_blank(), 
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(), 
-        legend.position = "none") + 
-  theme(axis.text.x=element_text(color=c("black","transparent","black","transparent",
-                                         "black","transparent","black","transparent","black")))
-
-
-west2 <- ggplot(cat_df2$west_pacf)+
-  geom_point(aes(lon, lat, color = value), size = 2.0) +
-  facet_wrap(~variable) + 
-  geom_sf(data = shp, fill="#979797", color="white") + 
-  coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) +  
-  scale_color_gradientn(name = "value", breaks =  c(0.1, 0.3, 0.5, 0.7, 0.9),
-                        colours=c("green","orange", "red", "blue"), limits = c(0.07, 0.98)) +
-  theme_small + 
-  theme(strip.background = element_blank(), 
-        strip.text = element_blank(), 
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(), 
-        legend.position = "bottom", legend.key.width = unit(1.5, "cm"), 
-        legend.key.height = unit(0.4, 'cm'), 
-        legend.title = element_blank()) + 
+west_pod <- atln_pod %+% cat_df$POD + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
+  ggtitle("West Pacific") + 
+  theme(legend.position = "right", legend.key.width = unit(0.5, "cm")) + 
+  #       legend.key.height = unit(0.4, 'cm'), 
+  #       legend.title = element_blank()) + 
   guides(colour = guide_coloursteps(show.limits = FALSE))
 
 
-g2 <- ggplotGrob(ind2)
-g3 <- ggplotGrob(atln2)
-g4 <- ggplotGrob(east2)
-g5 <- ggplotGrob(west2)
-g <- rbind(g2, g3, g4,g5, size = "first")
-g$widths <- unit.pmax(g2$widths, g3$widths, g4$widths, g5$widths)
-grid.newpage()
-grid.draw(g)
+pod <- ggarrange(ind_pod, atln_pod, east_pod, west_pod, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.42))
 
 
-# ggsave('g2.png', plot = g, width=8.6, height = 8.6, units = "in", dpi = 600)
-# ggsave('g3.png', plot = g, width=9.6, height = 8.6, units = "in", dpi = 600)
-ggsave('results/paper_fig/POD_FAR_CSI_final2.png', plot = g, width=7.3, height = 9.6, 
-       units = "in", dpi = 600)
+### FAR
+
+ind_far <- ggplot(cat_df$FAR)+
+  geom_point(aes(lon, lat, color = value), size = 1.5) +
+  #facet_wrap(~ocn, ncol = 1) + 
+  geom_sf(data = shp, fill="#979797", color="white") + 
+  coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
+  scale_color_gradientn(name = "FAR", breaks =  c(0.1, 0.3, 0.5, 0.7, 0.9),
+                        colours=c("green","orange", "red", "blue"), limits = c(0, 1)) +
+  theme_small + 
+  theme(axis.title.y = element_blank(), 
+        axis.title.x = element_blank(), 
+        axis.text.x=element_blank(), 
+        legend.position = "none")
+
+atln_far <- ind_far + coord_sf(ylim = c(-20, 20), xlim = c(-45, 0)) + 
+  theme(axis.text.y=element_blank())
+east_far <- atln_far + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) 
+# theme(axis.text.x=element_text(color=c("black","transparent","black","transparent",
+#                                        "black","transparent","black","transparent","black")))
+
+west_far <- atln_far %+% cat_df$far + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
+  theme(legend.position = "right", legend.key.width = unit(0.5, "cm")) + 
+  #       legend.key.height = unit(0.4, 'cm'), 
+  #       legend.title = element_blank()) + 
+  guides(colour = guide_coloursteps(show.limits = FALSE))
+
+
+far <- ggarrange(ind_far, atln_far, east_far, west_far, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.42))
+
+
+
+### CSI
+
+ind_csi <- ggplot(cat_df$CSI)+
+  geom_point(aes(lon, lat, color = value), size = 1.5) +
+  #facet_wrap(~ocn, ncol = 1) + 
+  geom_sf(data = shp, fill="#979797", color="white") + 
+  coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
+  scale_color_gradientn(name = "CSI", breaks =  c(0.1, 0.3, 0.5, 0.7, 0.9),
+                        colours=c("green","orange", "red", "blue"), limits = c(0, 1)) +
+  theme_small + 
+  theme(axis.title.y = element_blank(), 
+        axis.title.x = element_blank(), 
+        #axis.text.x=element_blank(), 
+        legend.position = "none")
+
+atln_csi <- ind_csi + coord_sf(ylim = c(-20, 20), xlim = c(-45, 0)) + 
+  theme(axis.text.y=element_blank())
+
+east_csi <- atln_csi + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) + 
+  theme(axis.text.x=element_text(color=c("transparent","black","transparent","black",
+                                         "transparent","black","transparent","black","transparent")))
+
+west_csi <- atln_csi %+% cat_df$CSI + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
+  theme(legend.position = "right", legend.key.width = unit(0.5, "cm")) + 
+  #       legend.key.height = unit(0.4, 'cm'), 
+  #       legend.title = element_blank()) + 
+  guides(colour = guide_coloursteps(show.limits = FALSE))
+
+
+csi <- ggarrange(ind_csi, atln_csi, east_csi, west_csi, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.42))
+
+
+
+ggarrange(pod, far, csi, nrow = 3, align = "hv", heights = c(1.3, 1,  1.3))
+
+ggsave("results/paper_fig/POD_FAR_CSI.png",
+       width = 7.6, height = 5.3, units = "in", dpi = 600)
 
 
 
@@ -162,21 +183,24 @@ ind_bias <- ggplot(vol_df$BIAS)+
   scale_color_gradientn(name = "Bias", breaks =  c(-3, 0, 3, 6, 9, 12),
                         colours=c("green","orange", "red", "blue"), limits = c(0-.3, 13)) +
   theme_small + 
+  ggtitle("Indian") + 
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
         axis.text.x=element_blank(), 
-        legend.position = "none")
+        legend.position = "none", plot.title = element_text(hjust = 0.5))
 
-atln_bias <- ind_bias + coord_sf(ylim = c(-20, 20), xlim = c(-45, 0)) + theme(axis.text.y=element_blank())
-east_bias <- atln_bias + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) #+ 
-  # theme(axis.text.x=element_text(color=c("black","transparent","black","transparent",
-  #                                        "black","transparent","black","transparent","black")))
+atln_bias <- ind_bias + coord_sf(ylim = c(-20, 20), xlim = c(-45, 0)) + ggtitle("Atlantic") + 
+  theme(axis.text.y=element_blank())
 
+east_bias <- atln_bias + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) + 
+  ggtitle("East Pacific")
+  
 west_bias <- atln_bias %+% vol_df$BIAS + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
   theme(legend.position = "right", legend.key.width = unit(0.5, "cm")) + 
   #       legend.key.height = unit(0.4, 'cm'), 
   #       legend.title = element_blank()) + 
-  guides(colour = guide_coloursteps(show.limits = FALSE))
+  guides(colour = guide_coloursteps(show.limits = FALSE)) + 
+  ggtitle("West Pacific")
 
 
 bias <- ggarrange(ind_bias, atln_bias, east_bias, west_bias, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.42))
@@ -233,8 +257,9 @@ ind_mae <- ggplot(vol_df$MAE)+
 atln_mae <- ind_mae + coord_sf(ylim = c(-20, 20), xlim = c(-45, 0)) + theme(axis.text.y=element_blank())
 
 east_mae <- atln_mae + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) + 
-  theme(axis.text.x=element_text(color=c("black","transparent","black","transparent",
-                                         "black","transparent","black","transparent","black")))
+  theme(axis.text.x=element_text(color=c("transparent","black","transparent","black",
+                                         "transparent","black","transparent","black","transparent")))
+
 
 west_mae <- atln_mae %+% vol_df$mae + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
   theme(legend.position = "right", legend.key.width = unit(0.5, "cm")) +  
@@ -246,7 +271,7 @@ west_mae <- atln_mae %+% vol_df$mae + coord_sf(ylim = c(-20, 20), xlim = c(135, 
 mae <- ggarrange(ind_mae, atln_mae, east_mae, west_mae, ncol = 4, align = "hv", widths = c(1.26, 1, 1, 1.42))
 
 
-ggarrange(bias, rmse, mae, nrow = 3, align = "hv", heights = c(1, 1,  1.3))
+ggarrange(bias, rmse, mae, nrow = 3, align = "hv", heights = c(1.3, 1,  1.3))
 
 
 ggsave("results/paper_fig/BIAS_RMSE_MAE.png",
