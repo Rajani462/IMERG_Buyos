@@ -96,7 +96,8 @@ ggplot(imrg_obs, aes(rf_class, freq, fill = type)) +
   labs(x = "Precipitation intensities (mm/day)", y = "Frequency") + 
   theme_small + 
   facet_wrap(~ocn) + 
-  scale_fill_discrete(name = "", labels = c("Buoys", "IMERG")) + 
+  #scale_fill_discrete(name = "", labels = c("Buoys", "IMERG")) + 
+  scale_fill_manual(values = c("#4682B4", "#FF8247"), name = "", labels = c("Buoys", "IMERG")) + 
   theme(legend.position = c(0.07, 0.90)) + 
   theme(axis.text.x = element_text(angle = 30, hjust = 0.8, vjust = 0.9))
 
@@ -123,7 +124,8 @@ ggplot(imrg_obs_vol, aes(rf_class, perc, fill = type)) +
   labs(x = "Precipitation intensities (mm/day)", y = "Volume") + 
   facet_wrap(~ocn) + 
   theme_small + 
-  scale_fill_discrete(name = "", labels = c("Buoys", "IMERG")) + 
+  #scale_fill_discrete(name = "", labels = c("Buoys", "IMERG")) + 
+  scale_fill_manual(values = c("#4682B4", "#FF8247"), name = "", labels = c("Buoys", "IMERG")) + 
   theme(legend.position = c(0.07, 0.90)) + 
   theme(axis.text.x = element_text(angle = 30, hjust = 0.8, vjust = 0.9))
 
