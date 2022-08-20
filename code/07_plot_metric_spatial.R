@@ -168,10 +168,12 @@ ggsave("results/paper_fig/POD_FAR_CSI.png",
 
 
 vol_met <- met_latlon[imrg_run == 'imrg_f', .(lat, lon, BIAS, RMSE, MAE, ocn)]
+
+vol_met <- vol_met[, lapply(.SD, round, 2), by = .(lat, lon, ocn)]
+
 plot_vol_met <- melt(vol_met, c("lat", "lon", "ocn"))
 
 vol_df <- split(plot_vol_met, f = plot_vol_met$variable)
-
 
 ### Bias
 
@@ -180,8 +182,8 @@ ind_bias <- ggplot(vol_df$BIAS)+
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_gradientn(name = "Bias", breaks =  c(-3, 0, 3, 6, 9, 12),
-                        colours=c("green","orange", "red", "blue"), limits = c(0-.3, 13)) +
+  scale_color_gradientn(name = "Bias", breaks =  c(0, 1, 3, 6, 9, 12),
+                        colours=c("gray", "green","orange", "red", "blue"), limits = c(-0.31, 13)) +
   theme_small + 
   ggtitle("Indian") + 
   theme(axis.title.y = element_blank(), 
@@ -199,7 +201,7 @@ west_bias <- atln_bias %+% vol_df$BIAS + coord_sf(ylim = c(-20, 20), xlim = c(13
   theme(legend.position = "right", legend.key.width = unit(0.5, "cm")) + 
   #       legend.key.height = unit(0.4, 'cm'), 
   #       legend.title = element_blank()) + 
-  guides(colour = guide_coloursteps(show.limits = FALSE)) + 
+  guides(colour = guide_coloursteps(show.limits = TRUE)) + 
   ggtitle("West Pacific")
 
 
