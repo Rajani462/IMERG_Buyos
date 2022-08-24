@@ -58,3 +58,18 @@ ggplot(met_all_plot, aes(ocn, value, fill = imrg_run)) +
 ggsave("results/paper_fig/boxplot_metrices.png",
        width = 7.2, height = 5.5, units = "in", dpi = 600)
 
+#################################################################
+
+### mean 
+
+ind_mean <- met_all[imrg_run == "imrg_f" & ocn == "ind"]
+summary(ind_mean)
+
+atln_mean <- met_all[imrg_run == "imrg_f" & ocn == "atln"]
+summary(atln_mean)
+
+east_pacf_mean <- met_all[imrg_run == "imrg_f" & ocn == "east_pacf"]
+summary(east_pacf_mean)
+
+west_pacf_mean <- met_all[imrg_run == "imrg_f" & ocn == "west_pacf"]
+summary(west_pacf_mean)

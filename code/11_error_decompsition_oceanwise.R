@@ -89,3 +89,12 @@ ggsave("results/paper_fig/error_decomp_f.png",
        width = 7.2, height = 5.5, units = "in", dpi = 600)
 
 ###########################################################
+
+
+
+false_alrms <- catmet_ocn[imrg_run == "IMERG-F" & rf_class == "FA"]
+
+ggplot(false_alrms[imrg_run == "IMERG-F"], aes(buyos)) + 
+  geom_bar() + 
+  facet_grid(~ocn)
+  
