@@ -68,7 +68,9 @@ ggplot(error_plot[rf_class != "CN"], aes(ocn, bias, fill = imrg_run)) +
   theme_small + 
   coord_flip() + 
   theme(legend.position = "bottom",
-        legend.title = element_blank())
+        legend.title = element_blank(), 
+        strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'))
 
 ggsave("results/paper_fig/error_decomp.png",
        width = 7.2, height = 5.5, units = "in", dpi = 600)

@@ -151,7 +151,7 @@ ggplot(ind_alt_pacf_long[variable == "IMERG-F"], aes(factor(thresh), value, col 
         legend.text = element_text(family = font, size = 14, color = "#222222")) + 
   theme(strip.background = element_rect(fill = "white"), 
         strip.text = element_text(colour = 'Black'), 
-        strip.text.x = element_text(size = 14))
+        strip.text.x = element_text(size = 12))
 
 ggsave("results/paper_fig/cat_met_pecentile_f.png",
        width = 7.2, height = 5.2, units = "in", dpi = 600)

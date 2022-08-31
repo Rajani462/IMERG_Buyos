@@ -94,7 +94,9 @@ ggplot(ind_alt_pacf_meanplot[variable == "IMERG-F" & buyos >= 0.1 & imrg_rf >= 0
   geom_label(data = stat_met2,
              aes(x = 95, y = 0.3, label = lab), label.padding = unit(0.1, "lines"), 
              label.size=0, size = 2.5) + 
-  theme_very_small
+  theme_very_small + 
+  theme(strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'))
 
 ggsave("results/paper_fig/scat_dens_hitdays_imrg_f.png",
        width = 9.9, height = 3.0, units = "in", dpi = 600)

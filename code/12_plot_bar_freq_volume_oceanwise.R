@@ -99,7 +99,9 @@ ggplot(imrg_obs, aes(rf_class, freq, fill = type)) +
   #scale_fill_discrete(name = "", labels = c("Buoys", "IMERG")) + 
   scale_fill_manual(values = c("#4682B4", "#FF8247"), name = "", labels = c("Buoys", "IMERG")) + 
   theme(legend.position = c(0.07, 0.90)) + 
-  theme(axis.text.x = element_text(angle = 30, hjust = 0.8, vjust = 0.9))
+  theme(axis.text.x = element_text(angle = 30, hjust = 0.8, vjust = 0.9)) + 
+  theme(strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'))
 
 ggsave("results/paper_fig/freqency_ind_atln_pacf.png",
        width = 7.2, height = 5.2, units = "in", dpi = 600)
@@ -127,7 +129,9 @@ ggplot(imrg_obs_vol, aes(rf_class, perc, fill = type)) +
   #scale_fill_discrete(name = "", labels = c("Buoys", "IMERG")) + 
   scale_fill_manual(values = c("#4682B4", "#FF8247"), name = "", labels = c("Buoys", "IMERG")) + 
   theme(legend.position = c(0.07, 0.90)) + 
-  theme(axis.text.x = element_text(angle = 30, hjust = 0.8, vjust = 0.9))
+  theme(axis.text.x = element_text(angle = 30, hjust = 0.8, vjust = 0.9)) + 
+  theme(strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'))
 
 ggsave("results/paper_fig/volume_ind_atln_pacf.png",
        width = 7.2, height = 5.2, units = "in", dpi = 600)
