@@ -30,7 +30,6 @@ pacf_met <- readRDS("./data/metrics_pacf.rds")
 # pre-process the data for plotting ----------------------------------------
 
 
-
 all_stations <- rbind(ind_station, atln_station, pacf_station)
 all_metrcis <- rbind(ind_met, atln_met, pacf_met)
 
@@ -177,13 +176,20 @@ vol_df <- split(plot_vol_met, f = plot_vol_met$variable)
 
 ### Bias
 
+pal <- c("yellow2", "yellowgreen", "seagreen", "royalblue2", "darkorange2", "maroon3", "red3")
+
+scale_color_fermenter_custom <- function(pal, na.value = "grey50", guide = "coloursteps", aesthetics = "color", ...) {
+  binned_scale("color", "fermenter", ggplot2:::binned_pal(scales::manual_pal(unname(pal))), na.value = na.value, guide = guide, ...)  
+}
+
+
+
 ind_bias <- ggplot(vol_df$BIAS)+
   geom_point(aes(lon, lat, color = value), size = 1.5) +
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_gradientn(name = "Bias", breaks =  c(0, 1, 3, 6, 9, 12),
-                        colours=c("gray", "green","orange", "red", "blue"), limits = c(-0.31, 13)) +
+  scale_color_fermenter_custom(name = "Bias", pal, breaks =  c(0, 1, 3, 6, 9, 12), limits = c(-0.31, 13.12)) + 
   theme_small + 
   ggtitle("Indian") + 
   theme(axis.title.y = element_blank(), 
@@ -199,10 +205,8 @@ east_bias <- atln_bias + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) +
   
 west_bias <- atln_bias %+% vol_df$BIAS + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
   theme(legend.position = "right", legend.key.width = unit(0.5, "cm")) + 
-  #       legend.key.height = unit(0.4, 'cm'), 
-  #       legend.title = element_blank()) + 
-  guides(colour = guide_coloursteps(show.limits = TRUE)) + 
   ggtitle("West Pacific")
+  
 
 
 bias <- ggarrange(ind_bias, atln_bias, east_bias, west_bias, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.42))
@@ -215,8 +219,7 @@ ind_rmse <- ggplot(vol_df$RMSE)+
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_gradientn(name = "RMSE", breaks =  c(0, 5, 10, 15, 20, 25),
-                        colours=c("green","orange", "red", "blue"), limits = c(0.5, 31.5)) +
+  scale_color_fermenter_custom(name = "RMSE", pal, breaks = c(0, 5, 10, 15, 20, 25), limits = c(0.5, 31.5)) + 
   theme_small + 
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
@@ -231,10 +234,10 @@ east_rmse <- atln_rmse + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) #+
   #                                        "black","transparent","black","transparent","black")))
 
 west_rmse <- atln_rmse %+% vol_df$rmse + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
-  theme(legend.position = "right", legend.key.width = unit(0.5, "cm")) +  
+  theme(legend.position = "right", legend.key.width = unit(0.5, "cm"))
   #       legend.key.height = unit(0.4, 'cm'), 
   #       legend.title = element_blank()) + 
-  guides(colour = guide_coloursteps(show.limits = FALSE))
+  #guides(colour = guide_coloursteps(show.limits = FALSE))
 
 
 rmse <- ggarrange(ind_rmse, atln_rmse, east_rmse, west_rmse, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.42))
@@ -248,9 +251,8 @@ ind_mae <- ggplot(vol_df$MAE)+
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_gradientn(name = "MAE", breaks =  c(0, 3, 6, 9, 12),
-                        colours=c("green","orange", "red", "blue"), limits = c(0.1, 13.1)) +
-  theme_small + 
+  scale_color_fermenter_custom(name = "MAE", pal, breaks =  c(0, 3, 6, 9, 12), limits = c(0.1, 13.1)) + 
+  theme_small +  
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
         legend.position = "none")
@@ -264,10 +266,10 @@ east_mae <- atln_mae + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) +
 
 
 west_mae <- atln_mae %+% vol_df$mae + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
-  theme(legend.position = "right", legend.key.width = unit(0.5, "cm")) +  
+  theme(legend.position = "right", legend.key.width = unit(0.5, "cm"))
   #       legend.key.height = unit(0.4, 'cm'), 
   #       legend.title = element_blank()) + 
-  guides(colour = guide_coloursteps(show.limits = FALSE))
+  #guides(colour = guide_coloursteps(show.limits = FALSE))
 
 
 mae <- ggarrange(ind_mae, atln_mae, east_mae, west_mae, ncol = 4, align = "hv", widths = c(1.26, 1, 1, 1.42))
