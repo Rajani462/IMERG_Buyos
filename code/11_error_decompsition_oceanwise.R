@@ -48,9 +48,15 @@ catmet_ocn[imrg_rf <= 0.1 & buyos <= 0.1, rf_class := factor('CN')]
 
 catmet_ocn
 setnames(catmet_ocn, "variable", "imrg_run")
-error_decom <- catmet_ocn[, .(bias = sum(imrg_rf - buyos)/.N), by = .(ocn, imrg_run, rf_class)]
+#error_decom <- catmet_ocn[, .(bias = sum(imrg_rf - buyos)/.N), by = .(ocn, imrg_run, rf_class)]
 
-error_total <- catmet_ocn[, .(rf_class = factor('tot_bias'), bias = sum(imrg_rf - buyos)/.N), by = .(ocn, imrg_run)]
+error_decom <- catmet_ocn[, .(imrg_rf = sum(imrg_rf), buyos = sum(buyos), bias = (sum(imrg_rf) - sum(buyos))), by = .(ocn, imrg_run, rf_class)]
+error_decom <- error_decom[, .(bias, bias_per = (bias / sum(buyos))*100, rf_class ), by = .(ocn, imrg_run)]
+
+#error_total <- catmet_ocn[, .(rf_class = factor('tot_bias'), bias = sum(imrg_rf - buyos)/.N), by = .(ocn, imrg_run)]
+error_total <- catmet_ocn[, .(rf_class = factor('tot_bias'), bias = (sum(imrg_rf) - sum(buyos)), 
+                              bias_per = ((sum(imrg_rf) - sum(buyos))/sum(buyos))*100), by = .(ocn, imrg_run)]
+
 
 # join 
 
@@ -60,10 +66,10 @@ levels(error_plot$rf_class) <- c("Hit bias", "Missed bias", "False alarm bias", 
 
 ### plot
 
-ggplot(error_plot[rf_class != "CN"], aes(ocn, bias, fill = imrg_run)) + 
+ggplot(error_plot[rf_class != "CN"], aes(ocn, bias_per, fill = imrg_run)) + 
   geom_col(position=position_dodge()) + 
   facet_wrap(~rf_class, scales = "free_x", ncol = 4) + 
-  labs(x = "Ocean", y = "Bias (mm/day)") + 
+  labs(x = "Ocean", y = "Bias (%)") + 
   scale_fill_manual(values = c("808000",  "#D35C37", "#6590bb")) + 
   theme_small + 
   coord_flip() + 
@@ -75,16 +81,34 @@ ggplot(error_plot[rf_class != "CN"], aes(ocn, bias, fill = imrg_run)) +
 ggsave("results/paper_fig/error_decomp.png",
        width = 7.2, height = 5.5, units = "in", dpi = 600)
 
-
-ggplot(error_plot[rf_class != "CN" & imrg_run == "IMERG-F"], aes(ocn, bias, fill = ocn)) + 
-  geom_col() + 
-  facet_wrap(~rf_class, ncol = 4) + 
+ggplot(error_plot, aes(ocn, bias_per, fill = imrg_run)) + 
+  geom_col(position=position_dodge()) + 
+  facet_wrap(~rf_class, scales = "free_x", ncol = 5) + 
   labs(x = "Ocean", y = "Bias (mm/day)") + 
-  scale_fill_manual(values = c("808000",  "#D35C37", "#6590bb", "#b64925")) + 
+  scale_fill_manual(values = c("808000",  "#D35C37", "#6590bb")) + 
+  theme_very_small + 
+  coord_flip() + 
+  theme(legend.position = "bottom",
+        legend.title = element_blank(), 
+        strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'))
+
+ggsave("results/paper_fig/error_decomp2.png",
+       width = 9.2, height = 5.5, units = "in", dpi = 600)
+
+
+ggplot(error_plot[rf_class != "CN" & imrg_run == "IMERG-F"], aes(ocn, bias_per, fill = imrg_run)) + 
+  geom_col(position=position_dodge()) + 
+  facet_wrap(~rf_class, scales = "free_x", ncol = 4) + 
+  labs(x = "Ocean", y = "Bias (mm/day)") + 
+  scale_fill_manual(values = c("808000",  "#D35C37", "#6590bb")) + 
   theme_small + 
   coord_flip() + 
-  theme(legend.position = "none",
-        legend.title = element_blank())
+  theme(legend.position = "bottom",
+        legend.title = element_blank(), 
+        strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'))
+
 
 
 ggsave("results/paper_fig/error_decomp_f.png",
@@ -100,3 +124,10 @@ ggplot(false_alrms[imrg_run == "IMERG-F"], aes(buyos)) +
   geom_bar() + 
   facet_grid(~ocn)
   
+
+false_alrms_ind <- false_alrms[ocn == "Indian"]
+
+false_alrms_ind_melt <- melt(false_alrms_ind, c("date", "imrg_run", "ocn", "rf_class"))
+
+ggplot(false_alrms_ind_melt, aes(date, value, col = variable)) + 
+  geom_line()

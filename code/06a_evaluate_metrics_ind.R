@@ -20,9 +20,10 @@ ind_rama_imrg_long <- melt(ind_rama_imrg, c("lat", "lon", "date", "sname", "ind_
                       value.name = "imrg_rf", variable.name = "imrg_run")
 
 volmet_ind <- ind_rama_imrg_long[, .(bias = sum(imrg_rf - ind_rama)/.N, 
-                                 rmse = sqrt(sum((imrg_rf - ind_rama)^2)/.N), 
-                                 mae = sum(abs(imrg_rf - ind_rama))/.N, 
-                                 ocn = factor('ind')), by = .(sname, imrg_run)]
+                                     #rbias = ((sum(imrg_rf - ind_rama))/sum(ind_rama))*100, 
+                                     rmse = sqrt(sum((imrg_rf - ind_rama)^2)/.N), 
+                                     mae = sum(abs(imrg_rf - ind_rama))/.N, 
+                                     ocn = factor('ind')), by = .(sname, imrg_run)]
 
 ### plot
 
