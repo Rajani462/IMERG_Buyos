@@ -22,11 +22,11 @@ pacf_tao_imrg_long <- melt(pacf_tao_imrg, c("lat", "lon", "date", "sname", "pacf
 volmet_pacf <- pacf_tao_imrg_long[, .(bias = sum(imrg_rf - pacf_tao)/.N, 
                                  rmse = sqrt(sum((imrg_rf - pacf_tao)^2)/.N), 
                                  mae = sum(abs(imrg_rf - pacf_tao))/.N, 
-                                 ocn = factor('pacf')), by = .(sname, imrg_run)]
+                                 ocn = factor('pacf')), by = .(sname, lat, lon, imrg_run)]
 
 ### plot
 
-volmet_pacf_plot <- melt(volmet_pacf, c("sname", "imrg_run", "ocn"))
+volmet_pacf_plot <- melt(volmet_pacf, c("sname", "lat", "lon", "imrg_run", "ocn"))
 
 ggplot(volmet_pacf_plot, aes(fill = imrg_run, y = value, x = sname)) + 
   geom_bar(position="dodge", stat="identity") + 
