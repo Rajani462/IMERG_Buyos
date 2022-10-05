@@ -50,37 +50,8 @@ stat_met2 <- as_tibble(stat_met) %>% group_by(variable) %>%
 
 # plots -------------------------------------------------------------------
 
-# levels(ind_alt_pacf_meanplot$variable) <- c("IMERG-E", "IMERG-L", "IMERG-F")
-# levels(ind_alt_pacf_meanplot$ocn) <- c("Indian", "Atlantic", "East Pacific", "West Pacific")
 
-
-### only for hit days (precipitation >= 0.1)
-
-ggplot(ind_alt_pacf_meanplot[buyos >= 0.1 & imrg_rf >= 0.1], aes(x = buyos, y = imrg_rf)) +
-  geom_bin2d(bins = 50) + 
-  labs(x = "Buyos (mm/day)", y = "IMERG (mm/day)") +  
-  geom_abline(intercept = 0, slope = 1, col = "red") + 
-  scale_fill_continuous(type = "viridis") +  
-  facet_grid(variable~ocn) + 
-  scale_x_log10()+scale_y_log10()+
-   coord_cartesian(xlim=c(0.1, 220),ylim=c(0.1,220)) + 
-  geom_label(data = stat_met2,
-              aes(x = 0.28, y = 70, label = lab), label.padding = unit(0.25, "lines"), 
-              label.size=0, size = 2.5) + 
-  theme_small 
-  # theme(axis.text.x = element_blank(),
-  #       axis.title.x = element_blank(),
-  #       axis.text.y = element_text(size = 10), 
-  #       axis.title.y = element_text(size = 10)) + 
-  # theme(strip.background = element_rect(fill = "white"), #for presentation slide
-  #       strip.text = element_text(colour = 'Black'), 
-  #       #strip.text = element_blank(),
-  #       strip.text.x = element_text(size = 14))
-
-ggsave("results/paper_fig/scat_dens_hitdays.png",
-       width = 7.2, height = 5.3, units = "in", dpi = 600)
-
-### only for imrg_final run
+### only for hit days (precipitation >= 0.1) and imrg_final run
 
 ggplot(ind_alt_pacf_meanplot[variable == "IMERG-F" & buyos >= 0.1 & imrg_rf >= 0.1], aes(x = buyos, y = imrg_rf)) +
   geom_bin2d(bins = 50) + 
@@ -100,6 +71,30 @@ ggplot(ind_alt_pacf_meanplot[variable == "IMERG-F" & buyos >= 0.1 & imrg_rf >= 0
 
 ggsave("results/paper_fig/scat_dens_hitdays_imrg_f.png",
        width = 9.9, height = 3.0, units = "in", dpi = 600)
+
+
+
+##########################################################################
+
+
+###  for all imrg runs
+
+ggplot(ind_alt_pacf_meanplot[buyos >= 0.1 & imrg_rf >= 0.1], aes(x = buyos, y = imrg_rf)) +
+  geom_bin2d(bins = 50) + 
+  labs(x = "Buyos (mm/day)", y = "IMERG (mm/day)") +  
+  geom_abline(intercept = 0, slope = 1, col = "red") + 
+  scale_fill_continuous(type = "viridis") +  
+  facet_grid(variable~ocn) + 
+  scale_x_log10()+scale_y_log10()+
+  coord_cartesian(xlim=c(0.1, 220),ylim=c(0.1,220)) + 
+  geom_label(data = stat_met2,
+             aes(x = 0.28, y = 70, label = lab), label.padding = unit(0.25, "lines"), 
+             label.size=0, size = 2.5) + 
+  theme_small
+
+ggsave("results/figures/scat_dens_hitdays.png",
+       width = 7.2, height = 5.3, units = "in", dpi = 600)
+
 
 ### all_days
 
@@ -124,7 +119,7 @@ ggplot(ind_alt_pacf_meanplot, aes(x = buyos, y = imrg_rf)) +
              label.size=0, size = 2.0) + 
   theme_small
 
-ggsave("results/paper_fig/scat_dens_alldays.png",
+ggsave("results/figures/scat_dens_alldays.png",
        width = 7.2, height = 5.3, units = "in", dpi = 600)
 
 
@@ -147,7 +142,7 @@ ggplot(ind_alt_pacf_meanplot[variable == "IMERG-F"], aes(x = buyos, y = imrg_rf)
   theme_small
 
 
-ggsave("results/paper_fig/scat_dens_alldays_finalrun.png",
+ggsave("results/figures/scat_dens_alldays_finalrun.png",
        width = 7.2, height = 5.3, units = "in", dpi = 600)
 
 
@@ -174,7 +169,7 @@ ggplot(ind_alt_pacf_meanplot, aes(x = buyos, y = imrg_rf)) +
   theme_small
 
 
-ggsave("results/paper_fig/scat_dens_alldays2.png",
+ggsave("results/figures/scat_dens_alldays2.png",
        width = 7.2, height = 5.3, units = "in", dpi = 600)
 
 
@@ -240,8 +235,6 @@ yearly <- ind_atln_pacf_mean[, lapply(.SD, sum, na.rm=TRUE), by = .(year(date), 
                                .SDcols=c("imrg_e", "imrg_l", "imrg_f", "buyos")]
 
 yearly_plot <- melt(yearly, c("year", "ocn"))
-
-
 
 ggplot(yearly_plot, aes(group = variable, y = value, x = factor(year))) + 
   geom_line(aes(color = variable)) + 
