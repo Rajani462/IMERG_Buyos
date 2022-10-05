@@ -81,6 +81,10 @@ ggplot(error_plot[rf_class != "CN"], aes(ocn, bias_per, fill = imrg_run)) +
 ggsave("results/paper_fig/error_decomp.png",
        width = 7.2, height = 5.5, units = "in", dpi = 600)
 
+
+#######################################################################################3
+
+
 ggplot(error_plot, aes(ocn, bias_per, fill = imrg_run)) + 
   geom_col(position=position_dodge()) + 
   facet_wrap(~rf_class, scales = "free_x", ncol = 5) + 
@@ -93,7 +97,7 @@ ggplot(error_plot, aes(ocn, bias_per, fill = imrg_run)) +
         strip.background = element_rect(fill = "white"),
         strip.text = element_text(colour = 'Black'))
 
-ggsave("results/paper_fig/error_decomp2.png",
+ggsave("results/figures/error_decomp2.png",
        width = 9.2, height = 5.5, units = "in", dpi = 600)
 
 
@@ -111,7 +115,7 @@ ggplot(error_plot[rf_class != "CN" & imrg_run == "IMERG-F"], aes(ocn, bias_per, 
 
 
 
-ggsave("results/paper_fig/error_decomp_f.png",
+ggsave("results/figures/error_decomp_f.png",
        width = 7.2, height = 5.5, units = "in", dpi = 600)
 
 ###########################################################
