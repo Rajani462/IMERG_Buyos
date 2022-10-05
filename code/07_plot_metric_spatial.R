@@ -189,7 +189,7 @@ ind_bias <- ggplot(vol_df$BIAS)+
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_fermenter_custom(name = "Bias", pal, breaks =  c(0, 1, 3, 6, 9, 12), limits = c(-0.31, 13.12)) + 
+  scale_color_fermenter_custom(name = "Bias", pal, breaks =  c(-1, 0, 1, 2, 3, 4, 5), limits = c(-1.10, 4.680)) + 
   theme_small + 
   ggtitle("Indian") + 
   theme(axis.title.y = element_blank(), 
@@ -219,7 +219,7 @@ ind_rmse <- ggplot(vol_df$RMSE)+
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_fermenter_custom(name = "RMSE", pal, breaks = c(0, 5, 10, 15, 20, 25), limits = c(0.5, 31.5)) + 
+  scale_color_fermenter_custom(name = "RMSE", pal, breaks = c(0, 5, 10, 15, 20, 25), limits = c(0.5, 26.34)) + 
   theme_small + 
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
@@ -251,7 +251,7 @@ ind_mae <- ggplot(vol_df$MAE)+
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_fermenter_custom(name = "MAE", pal, breaks =  c(0, 3, 6, 9, 12), limits = c(0.1, 13.1)) + 
+  scale_color_fermenter_custom(name = "MAE", pal, breaks =  c(0, 2, 4, 6, 8), limits = c(0.1, 9.32)) + 
   theme_small +  
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
@@ -282,3 +282,4 @@ ggsave("results/paper_fig/BIAS_RMSE_MAE.png",
        width = 7.6, height = 5.3, units = "in", dpi = 600)
 
 ################################################################################################
+
