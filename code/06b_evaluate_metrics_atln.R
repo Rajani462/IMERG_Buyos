@@ -19,10 +19,12 @@ summary(atln_pirata_imrg)
 atln_pirata_imrg_long <- melt(atln_pirata_imrg, c("lat", "lon", "date", "sname", "atln_pirata"), 
                       value.name = "imrg_rf", variable.name = "imrg_run")
 
-volmet_atln <- atln_pirata_imrg_long[, .(bias = sum(imrg_rf - atln_pirata)/.N, 
-                                 rmse = sqrt(sum((imrg_rf - atln_pirata)^2)/.N), 
-                                 mae = sum(abs(imrg_rf - atln_pirata))/.N, 
-                                 ocn = factor('atln')), by = .(sname, imrg_run)]
+volmet_atln <- atln_pirata_imrg_long[, .(ref_mean = mean(atln_pirata, na.rm = TRUE), 
+                                         bias = sum(imrg_rf - atln_pirata)/.N, 
+                                         rbias = ((sum(imrg_rf - atln_pirata))/sum(atln_pirata))*100, 
+                                         rmse = sqrt(sum((imrg_rf - atln_pirata)^2)/.N), 
+                                         mae = sum(abs(imrg_rf - atln_pirata))/.N, 
+                                         ocn = factor('atln')), by = .(sname, imrg_run)]
 
 ### plot
 
