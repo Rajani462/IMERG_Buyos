@@ -81,6 +81,7 @@ ggplot(error_plot[rf_class != "CN"], aes(ocn, bias_per, fill = imrg_run)) +
 ggsave("results/paper_fig/error_decomp.png",
        width = 7.2, height = 5.5, units = "in", dpi = 600)
 
+saveRDS(error_plot, "./data/error_decomposition_plot.rds")
 
 #######################################################################################3
 
