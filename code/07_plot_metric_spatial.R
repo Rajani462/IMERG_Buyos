@@ -24,14 +24,14 @@ pacf_station <- readRDS("./data/pacf_tao_stations.rds")
 
 ind_met <- readRDS("./data/metrics_ind.rds")
 atln_met <- readRDS("./data/metrics_atln.rds")
-pacf_met <- readRDS("./data/metrics_pacf.rds")
-
+east_pacf_met <- readRDS("./data/metrics_east_pacf.rds")
+west_pacf_met <- readRDS("./data/metrics_west_pacf.rds")
 
 # pre-process the data for plotting ----------------------------------------
 
 
 all_stations <- rbind(ind_station, atln_station, pacf_station)
-all_metrcis <- rbind(ind_met, atln_met, pacf_met)
+all_metrcis <- rbind(ind_met, atln_met, east_pacf_met, west_pacf_met)
 
 lat_lon <- all_stations[, .(lat, lon, sname, qrn)]
 
@@ -44,8 +44,8 @@ met_latlon <- setnames(met_latlon, c("bias", "rmse", "mae"), c("BIAS", "RMSE", "
 
 levels(met_latlon$ocn)
 
-met_latlon[ocn == "pacf" & lon < 0, ocn := factor("east_pacf")]
-met_latlon[ocn == "pacf", ocn := factor("west_pacf")]
+#met_latlon[ocn == "pacf" & lon < 0, ocn := factor("east_pacf")]
+#met_latlon[ocn == "pacf", ocn := factor("west_pacf")]
 
 # plot the spatial plot of variuos metrices -------------------------------
 
