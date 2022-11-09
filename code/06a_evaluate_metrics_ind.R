@@ -24,6 +24,7 @@ volmet_ind <- ind_rama_imrg_long[, .(ref_mean = mean(ind_rama, na.rm = TRUE),
                                      rbias = ((sum(imrg_rf - ind_rama))/sum(ind_rama))*100,
                                      rmse = sqrt(sum((imrg_rf - ind_rama)^2)/.N), 
                                      mae = sum(abs(imrg_rf - ind_rama))/.N, 
+                                     cor = cor(imrg_rf, ind_rama), 
                                      ocn = factor('ind')), by = .(sname, imrg_run)]
 
 ### plot

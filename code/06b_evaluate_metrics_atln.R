@@ -24,6 +24,7 @@ volmet_atln <- atln_pirata_imrg_long[, .(ref_mean = mean(atln_pirata, na.rm = TR
                                          rbias = ((sum(imrg_rf - atln_pirata))/sum(atln_pirata))*100, 
                                          rmse = sqrt(sum((imrg_rf - atln_pirata)^2)/.N), 
                                          mae = sum(abs(imrg_rf - atln_pirata))/.N, 
+                                         cor = cor(imrg_rf, atln_pirata), 
                                          ocn = factor('atln')), by = .(sname, imrg_run)]
 
 ### plot

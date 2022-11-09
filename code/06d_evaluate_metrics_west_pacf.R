@@ -25,6 +25,7 @@ volmet_pacf <- pacf_tao_imrg_long[, .(ref_mean = mean(pacf_tao, na.rm = TRUE),
                                       rbias = ((sum(imrg_rf - pacf_tao))/sum(pacf_tao))*100, 
                                       rmse = sqrt(sum((imrg_rf - pacf_tao)^2)/.N), 
                                       mae = sum(abs(imrg_rf - pacf_tao))/.N, 
+                                      cor = cor(imrg_rf, pacf_tao), 
                                       ocn = factor('west_pacf')), by = .(sname, imrg_run)]
 
 ### plot
