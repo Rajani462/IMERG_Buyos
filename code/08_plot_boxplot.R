@@ -73,5 +73,26 @@ ggplot(met_all_plot, aes(ocn, value, fill = imrg_run)) +
 ggsave("results/boxplot_metrices.png",
        width = 7.2, height = 5.5, units = "in", dpi = 600)
 
+
+### plot for poster presentation
+
+ggplot(met_all_plot[variable == "BIAS" | variable == "COR"| variable == "CSI"], aes(ocn, value, fill = imrg_run)) + 
+  geom_boxplot() + 
+  facet_wrap(~variable, scales = "free_y", ncol = 3) + 
+  scale_fill_manual(values = c("808000",  "#D35C37", "#6590bb")) + 
+  #scale_fill_manual(values = mycol_continent5[c(4, 3, 2, 1)]) + 
+  #scale_fill_manual(values = c("#b64925", "808000", "#6590bb")) + 
+  labs(x = "", y = "") + 
+  theme_small + # for presentation slides
+  theme(legend.position = "bottom",
+        legend.title = element_blank()) +
+  theme(strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'),
+        axis.text.x = element_text(angle = 30, hjust = 0.8, vjust = 0.9))
+
+ggsave("results/poster_boxplot_metrices.png",
+       width = 7.2, height = 5.5, units = "in", dpi = 600)
+
+
 #################################################################
 
