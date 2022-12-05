@@ -55,7 +55,7 @@ ggsave("results/paper_fig/boxplot_metrices.png",
 
 ### with correlation
 
-ggplot(met_all_plot, aes(ocn, value, fill = imrg_run)) + 
+ggplot(met_all_plot[variable != "MAE" ], aes(ocn, value, fill = imrg_run)) + 
   geom_boxplot() + 
   facet_wrap(~variable, scales = "free_y", ncol = 3) + 
   scale_fill_manual(values = c("808000",  "#D35C37", "#6590bb")) + 
@@ -76,7 +76,7 @@ ggsave("results/boxplot_metrices.png",
 
 ### plot for poster presentation
 
-ggplot(met_all_plot[variable == "BIAS" | variable == "COR"| variable == "CSI"], aes(ocn, value, fill = imrg_run)) + 
+ggplot(met_all_plot[variable == "BIAS" | variable == "RMSE"| variable == "CSI"], aes(ocn, value, fill = imrg_run)) + 
   geom_boxplot() + 
   facet_wrap(~variable, scales = "free_y", ncol = 3) + 
   scale_fill_manual(values = c("808000",  "#D35C37", "#6590bb")) + 

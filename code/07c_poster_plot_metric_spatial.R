@@ -73,11 +73,14 @@ ind_bias <- ggplot(vol_df$BIAS)+
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_fermenter_custom(name = "Bias", pal, breaks =  c(-1, 0, 1, 2, 3, 4, 5), limits = c(-1.10, 4.680)) + 
+  #scale_color_fermenter_custom(name = "Bias", pal, breaks =  c(-1, 0, 1, 2, 3, 4, 5), limits = c(-1.10, 4.68)) + 
+  scale_color_gradientn(name = "Bias", breaks =  c(-1, 0, 1, 2, 3, 4, 5), 
+                        colours=c("green","orange", "red", "blue"), limits = c(-1.10, 4.68)) + 
   theme_small + 
   ggtitle("Indian") + 
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
+        axis.text = element_text(size = 6),
         axis.text.x=element_blank(), 
         legend.position = "none", plot.title = element_text(hjust = 0.4))
 
@@ -89,11 +92,12 @@ east_bias <- atln_bias + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) +
 
 west_bias <- atln_bias %+% vol_df$BIAS + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
   theme(legend.position = "right", legend.key.width = unit(0.5, "cm")) + 
+  guides(colour = guide_coloursteps(show.limits = FALSE)) + 
   ggtitle("West Pacific")
 
 
 
-bias <- ggarrange(ind_bias, atln_bias, east_bias, west_bias, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.42))
+bias <- ggarrange(ind_bias, atln_bias, east_bias, west_bias, ncol = 4, align = "hv", widths = c(1.28, 0.98, 0.98, 1.43))
 
 ggsave("results//BIAS.png",
        width = 7.6, height = 5.3, units = "in", dpi = 600)
@@ -187,15 +191,15 @@ ind_csi <- ggplot(cat_df$CSI)+
   theme_small + 
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
-        #axis.text.x=element_blank(), 
+        axis.text = element_text(size = 6), 
         legend.position = "none")
 
 atln_csi <- ind_csi + coord_sf(ylim = c(-20, 20), xlim = c(-45, 0)) + 
   theme(axis.text.y=element_blank())
 
 east_csi <- atln_csi + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) + 
-  theme(axis.text.x=element_text(color=c("transparent","black","transparent","black",
-                                         "transparent","black","transparent","black","transparent")))
+  theme(axis.text.x=element_text(color=c("transparent","#222222","transparent","#222222",
+                                         "transparent","#222222","transparent","#222222","transparent")))
 
 west_csi <- atln_csi %+% cat_df$CSI + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
   theme(legend.position = "right", legend.key.width = unit(0.5, "cm")) + 
@@ -204,7 +208,7 @@ west_csi <- atln_csi %+% cat_df$CSI + coord_sf(ylim = c(-20, 20), xlim = c(135, 
   guides(colour = guide_coloursteps(show.limits = FALSE))
 
 
-csi <- ggarrange(ind_csi, atln_csi, east_csi, west_csi, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.42))
+csi <- ggarrange(ind_csi, atln_csi, east_csi, west_csi, ncol = 4, align = "hv", widths = c(1.28, 0.98, 0.98, 1.43))
 
 ggsave("results//CSI.png",
        width = 7.6, height = 5.3, units = "in", dpi = 600)
@@ -216,7 +220,10 @@ ggsave("results//POD_FAR_CSI_BIAS.png",
        width = 7.6, height = 6.3, units = "in", dpi = 600)
 
 
+ggarrange(bias, csi, nrow = 2, align = "hv", heights = c(1, 1))
 
+ggsave("results//BIAS_CSI.png",
+       width = 7.5, height = 3.5, units = "in", dpi = 600)
 
 
 ################################################################################################
