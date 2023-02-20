@@ -189,7 +189,7 @@ ind_bias <- ggplot(vol_df$BIAS)+
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_fermenter_custom(name = "Bias", pal, breaks =  c(-1, 0, 1, 2, 3, 4, 5), limits = c(-1.10, 4.680)) + 
+  scale_color_fermenter_custom(name = "Bias (mm/day)", pal, breaks =  c(-1, 0, 1, 2, 3, 4, 5), limits = c(-1.10, 4.680)) + 
   theme_small + 
   ggtitle("Indian") + 
   theme(axis.title.y = element_blank(), 
@@ -209,7 +209,7 @@ west_bias <- atln_bias %+% vol_df$BIAS + coord_sf(ylim = c(-20, 20), xlim = c(13
   
 
 
-bias <- ggarrange(ind_bias, atln_bias, east_bias, west_bias, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.42))
+bias <- ggarrange(ind_bias, atln_bias, east_bias, west_bias, ncol = 4, align = "hv", widths = c(1.24, 1, 1, 1.54))
 
 
 ### RMSE
@@ -219,7 +219,7 @@ ind_rmse <- ggplot(vol_df$RMSE)+
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_fermenter_custom(name = "RMSE", pal, breaks = c(0, 5, 10, 15, 20, 25), limits = c(0.5, 26.34)) + 
+  scale_color_fermenter_custom(name = "RMSE (mm/day)", pal, breaks = c(0, 5, 10, 15, 20, 25), limits = c(0.5, 26.34)) + 
   theme_small + 
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
@@ -240,7 +240,7 @@ west_rmse <- atln_rmse %+% vol_df$rmse + coord_sf(ylim = c(-20, 20), xlim = c(13
   #guides(colour = guide_coloursteps(show.limits = FALSE))
 
 
-rmse <- ggarrange(ind_rmse, atln_rmse, east_rmse, west_rmse, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.42))
+rmse <- ggarrange(ind_rmse, atln_rmse, east_rmse, west_rmse, ncol = 4, align = "hv", widths = c(1.24, 1, 1, 1.60))
 
 
 
@@ -251,7 +251,7 @@ ind_mae <- ggplot(vol_df$MAE)+
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_fermenter_custom(name = "MAE", pal, breaks =  c(0, 2, 4, 6, 8), limits = c(0.1, 9.32)) + 
+  scale_color_fermenter_custom(name = "MAE (mm/day)", pal, breaks =  c(0, 2, 4, 6, 8), limits = c(0.1, 9.32)) + 
   theme_small +  
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
@@ -272,14 +272,14 @@ west_mae <- atln_mae %+% vol_df$mae + coord_sf(ylim = c(-20, 20), xlim = c(135, 
   #guides(colour = guide_coloursteps(show.limits = FALSE))
 
 
-mae <- ggarrange(ind_mae, atln_mae, east_mae, west_mae, ncol = 4, align = "hv", widths = c(1.26, 1, 1, 1.42))
+mae <- ggarrange(ind_mae, atln_mae, east_mae, west_mae, ncol = 4, align = "hv", widths = c(1.24, 1, 1, 1.54))
 
 
-ggarrange(bias, rmse, mae, nrow = 3, align = "hv", heights = c(1.3, 1,  1.3))
+ggarrange(bias, rmse, mae, nrow = 3, align = "hv", heights = c(1.29, 1.1,  1.27))
 
 
 ggsave("results/paper_fig/BIAS_RMSE_MAE.png",
-       width = 7.6, height = 5.3, units = "in", dpi = 600)
+       width = 9.2, height = 5.9, units = "in", dpi = 600)
 
 ################################################################################################
 

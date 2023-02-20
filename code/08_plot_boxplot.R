@@ -29,7 +29,7 @@ mycol_continent5 <- c( "#00B0F6", "#A3A500", "#00BF7D", "#e07b39",
 
 met_all_plot <- melt(met_all, c("sname", "imrg_run", "ocn"))
 
-levels(met_all_plot$variable) <- c("BIAS", "RMSE", "MAE", "COR", "POD",  "FAR", "CSI")
+levels(met_all_plot$variable) <- c("Bias (mm/day)", "RMSE (mm/day)", "MAE (mm/day)", "COR", "POD",  "FAR", "CSI")
 levels(met_all_plot$imrg_run) <- c("IMERG-E", "IMERG-L", "IMERG-F")
 levels(met_all_plot$ocn) <- c("Indian", "Atlantic", "East Pacific", "West Pacific")
 
