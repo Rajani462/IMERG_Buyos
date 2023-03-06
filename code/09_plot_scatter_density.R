@@ -247,3 +247,73 @@ ggplot(yearly_plot[ocn == "west_pacf"], aes(group = variable, y = value, x = fac
   geom_point() + 
   #facet_wrap(~ocn) + 
   theme_generic
+
+
+# with threshold of rain/norain = 1.0 mm/day ------------------------------
+
+threshold <- 1
+
+ind <- ind_alt_pacf_meanplot[variable == "IMERG-F" & ocn == "Indian" & buyos >= threshold & imrg_rf >= threshold]
+atln <- ind_alt_pacf_meanplot[variable == "IMERG-F" & ocn == "Atlantic" & buyos >= threshold & imrg_rf >= threshold]
+east_pacf <- ind_alt_pacf_meanplot[variable == "IMERG-F" & ocn == "East Pacific" & buyos >= threshold & imrg_rf >= threshold]
+west_pacf <- ind_alt_pacf_meanplot[variable == "IMERG-F" & ocn == "West Pacific" & buyos >= threshold & imrg_rf >= threshold]
+
+
+
+
+qval <- seq(0.1, 1.0, 0.01)
+qval <- c(0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7,0.75, 0.8, 0.85, 0.9, 0.95, 1.0)
+
+ind_buoy <- unname(round(quantile(ind$buyos, na.rm = T, probs = c(qval))))
+ind_imrg <- unname(round(quantile(ind$imrg_rf, na.rm = T, probs = c(qval))))
+
+dt_ind <- data.table(quantiles = c(qval), 
+                     buoy =  c(ind_buoy),
+                     imrg = c(ind_imrg), 
+                     ocn = "Indian")
+
+atln_buoy <- unname(round(quantile(atln$buyos, na.rm = T, probs = c(qval))))
+atln_imrg <- unname(round(quantile(atln$imrg_rf, na.rm = T, probs = c(qval))))
+
+dt_atln <- data.table(quantiles = c(qval), 
+                      buoy =  c(atln_buoy),
+                      imrg = c(atln_imrg), 
+                      ocn = "Atlantic")
+
+east_pacf_buoy <- unname(round(quantile(east_pacf$buyos, na.rm = T, probs = c(qval))))
+east_pacf_imrg <- unname(round(quantile(east_pacf$imrg_rf, na.rm = T, probs = c(qval))))
+
+dt_east_pacf <- data.table(quantiles = c(qval), 
+                           buoy =  c(east_pacf_buoy),
+                           imrg = c(east_pacf_imrg), 
+                           ocn = "East Pacific")
+
+west_pacf_buoy <- unname(round(quantile(west_pacf$buyos, na.rm = T, probs = c(qval))))
+west_pacf_imrg <- unname(round(quantile(west_pacf$imrg_rf, na.rm = T, probs = c(qval))))
+
+dt_west_pacf <- data.table(quantiles = c(qval), 
+                           buoy =  c(west_pacf_buoy),
+                           imrg = c(west_pacf_imrg), 
+                           ocn = "West Pacific")
+
+all_dat <- rbind(dt_ind, dt_atln, dt_east_pacf, dt_west_pacf)
+all_dat$ocn <- factor(all_dat$ocn, levels = c("Indian", "Atlantic", "East Pacific", "West Pacific"))
+
+ggplot(ind_alt_pacf_meanplot[variable == "IMERG-F" & buyos >= 1 & imrg_rf >= 1], aes(x = buyos, y = imrg_rf)) +
+  geom_bin2d(bins = 50) + 
+  labs(x = "Buyos (mm/day)", y = "IMERG (mm/day)") +  
+  geom_abline(intercept = 0, slope = 1, col = "black") + 
+  #scale_fill_continuous(type = "viridis") +  
+  scale_fill_distiller(palette = "Spectral") + 
+  facet_grid(~ocn) + 
+  scale_x_log10()+scale_y_log10()+
+  coord_cartesian(xlim=c(1, 220),ylim=c(1,220)) + 
+  geom_label(data = stat_met2,
+             aes(x = 95, y = 1.5, label = lab), label.padding = unit(0.1, "lines"), 
+             label.size=0, size = 2.5) + 
+  theme_very_small + 
+  theme(strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black')) + geom_line(aes(buoy, imrg), all_dat, col = "red")
+
+ggsave("./results/supp_fig/supp_scatdens_hitdaysimrgf.png",
+       width = 9.9, height = 4.0, units = "in", dpi = 600)
