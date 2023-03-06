@@ -8,7 +8,7 @@ library(rgdal)
 
 ##########
 
-mean_2001_20 <- readRDS("./data/imerg_spat_mean_25ns_2001_20.rds")
+#mean_2001_20 <- readRDS("./data/imerg_spat_mean_25ns_2001_20.rds")
 mean_2001_20_ocn <- readRDS("./data/ocn_mean_2001_20_dt.rds")
 
 ind_rama_imrg <- readRDS("./data/ind_rama_imrg.rds")
@@ -28,27 +28,27 @@ ind_atln_pacf <- rbind(ind, atln, pacf)
 name_shp <- readOGR("C:/Users/rkpra/OneDrive/Documents/R_projects/GPM_review/data/ne_110m_admin_0_countries",
 layer="ne_110m_admin_0_countries")
 
-name_shp2 <- readOGR("C:/Users/rkpra/OneDrive/Documents/R_projects/GPM_review/data/ne_10m_ocean",
-                     layer="ne_10m_ocean")
-
-mean_2001_20_df <- as.data.frame(mean_2001_20)
-
-coordinates(mean_2001_20_df) <- ~ lon + lat
-proj4string(mean_2001_20_df) <- proj4string(name_shp2)
+# name_shp2 <- readOGR("C:/Users/rkpra/OneDrive/Documents/R_projects/GPM_review/data/ne_10m_ocean",
+#                      layer="ne_10m_ocean")
+# 
+# mean_2001_20_df <- as.data.frame(mean_2001_20)
+# 
+# coordinates(mean_2001_20_df) <- ~ lon + lat
+# proj4string(mean_2001_20_df) <- proj4string(name_shp2)
 
 #absh <- SpatialPolygonsDataFrame(cz_union)
 
-memory.limit()
-memory.limit(size=90000)
-
-sf_type <- st_intersects(mean_2001_20_df, name_shp2)
-
-ocn_mean_2001_20 <- mean_2001_20_df[!is.na(over(mean_2001_20_df, as(name_shp2, "SpatialPolygons"))), ]
+# memory.limit()
+# memory.limit(size=90000)
+# 
+# sf_type <- st_intersects(mean_2001_20_df, name_shp2)
+# 
+# ocn_mean_2001_20 <- mean_2001_20_df[!is.na(over(mean_2001_20_df, as(name_shp2, "SpatialPolygons"))), ]
 
 
 ggplot(mean_2001_20_ocn) + 
 #ggplot(mean_2001_20) +
-geom_tile(aes(lon, lat, fill = mean_rf)) +
+geom_tile(aes(lon, lat, fill = mean_rf), alpha = 0.7) +
 #coord_fixed(ratio = 1) +
 scale_fill_viridis(direction = -1) +
 coord_sf(ylim = c(-25, 25), expand = c(0, 0)) +
@@ -57,8 +57,13 @@ geom_polygon(data = name_shp,
 aes(x = long, y = lat, group = group), fill="white", color="black") +
 #scale_color_gradient(low = "gray", high = "blue") +
 #geom_point(data = rama_atln_pacf, aes(lon, lat), colour = "red", size = 1) +
-geom_point(data = ind_atln_pacf, aes(lon, lat, color = buoys_rf), shape = 19, size = 1.5) +
-scale_color_gradientn(colours = c("grey","orange", "red", "black"), limits = c(0, 11)) +
+geom_point(data = ind_atln_pacf, aes(lon, lat, color = buoys_rf), shape = 21, size = 2.0) +
+geom_point(data = ind_atln_pacf, aes(lon, lat, color = buoys_rf), color = "black", shape = 21, size = 2.5) +
+  
+geom_point(data = ind_atln_pacf, aes(lon, lat, color = buoys_rf), shape = 19, size = 1.5) + 
+  
+  scale_color_viridis(direction = -1) + 
+#scale_color_gradientn(colours = c("grey","orange", "red", "black"), limits = c(0, 11)) +
 #scale_color_gradient(low = "gray", high = "red") +
 # guides(limits = c(1,4), fill = guide_colorbar(reverse = TRUE)) +
 # scale_fill_gradient(limits = c(1,4), breaks=c(1,2,3,4))
