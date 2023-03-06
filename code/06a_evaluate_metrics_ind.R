@@ -21,8 +21,10 @@ ind_rama_imrg_long <- melt(ind_rama_imrg, c("lat", "lon", "date", "sname", "ind_
 
 volmet_ind <- ind_rama_imrg_long[, .(ref_mean = mean(ind_rama, na.rm = TRUE), 
                                      bias = sum(imrg_rf - ind_rama)/.N, 
-                                     rbias = ((sum(imrg_rf - ind_rama))/sum(ind_rama))*100,
+                                     pbias = ((sum(imrg_rf - ind_rama))/sum(ind_rama))*100,
+                                     rbias = ((sum(imrg_rf - ind_rama))/sum(ind_rama)),
                                      rmse = sqrt(sum((imrg_rf - ind_rama)^2)/.N), 
+                                     nrmse = sqrt(sum((imrg_rf - ind_rama)^2)/.N)/sd(ind_rama), 
                                      mae = sum(abs(imrg_rf - ind_rama))/.N, 
                                      cor = cor(imrg_rf, ind_rama), 
                                      ocn = factor('ind')), by = .(sname, imrg_run)]
@@ -30,6 +32,12 @@ volmet_ind <- ind_rama_imrg_long[, .(ref_mean = mean(ind_rama, na.rm = TRUE),
 ### plot
 
 volmet_ind_plot <- melt(volmet_ind, c("sname", "imrg_run", "ocn"))
+
+ggplot(volmet_ind_plot, aes(fill = imrg_run, y = value, x = sname)) + 
+  geom_bar(position="dodge", stat="identity") + 
+  facet_grid(variable ~ ., scales = "free") + 
+  theme_small + 
+  theme(axis.text.x = element_text(angle = 50, hjust = 1, vjust = 1.2))
 
 ggplot(volmet_ind_plot, aes(fill = imrg_run, y = value, x = sname)) + 
   geom_bar(position="dodge", stat="identity") + 

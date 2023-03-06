@@ -22,8 +22,10 @@ pacf_tao_imrg_long <- melt(pacf_tao_imrg, c("lat", "lon", "date", "sname", "pacf
 
 volmet_pacf <- pacf_tao_imrg_long[, .(ref_mean = mean(pacf_tao, na.rm = TRUE), 
                                       bias = sum(imrg_rf - pacf_tao)/.N, 
-                                      rbias = ((sum(imrg_rf - pacf_tao))/sum(pacf_tao))*100, 
+                                      pbias = ((sum(imrg_rf - pacf_tao))/sum(pacf_tao))*100, 
+                                      rbias = ((sum(imrg_rf - pacf_tao))/sum(pacf_tao)), 
                                       rmse = sqrt(sum((imrg_rf - pacf_tao)^2)/.N), 
+                                      nrmse = sqrt(sum((imrg_rf - pacf_tao)^2)/.N)/sd(pacf_tao), 
                                       mae = sum(abs(imrg_rf - pacf_tao))/.N, 
                                       cor = cor(imrg_rf, pacf_tao), 
                                       ocn = factor('east_pacf')), by = .(sname, imrg_run)]
