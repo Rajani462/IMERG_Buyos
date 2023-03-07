@@ -22,7 +22,7 @@ rama[, `:=`(sname =  gsub(" ", "", paste(lat, "_", lon)))]
 rama_complete <- rama[complete.cases(rama), ]
 summary(rama_complete)
 
-# transform the precipitation rate from mm/hr to mm
+# transform the precipitation rate from mm/hr to mm/day
 
 rama_complete <- rama_complete[, .(lon, lat, date, rf = (rf * 24), qrn, srn, sname)]
 
