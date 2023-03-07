@@ -157,3 +157,93 @@ ggsave("results/paper_fig/cat_met_threshold_cross_scale.png",
        width = 7.2, height = 5.2, units = "in", dpi = 600)
 
 #############################################################
+
+
+
+# Compare the categorical metrics with rain/no-rain = 1 mm/day -----------
+
+source('./source/libs.R')
+source('./source/themes.R')
+source('./source/palettes.R')
+source('./source/functions.R')
+
+#### read the datasets
+
+ind_rama_imrg <- readRDS("./data/ind_rama_imrg.rds")
+atln_pirata_imrg <- readRDS("./data/atln_pirata_imrg.rds")
+pacf_tao_imrg <- readRDS("./data/pacf_tao_imrg.rds")
+
+
+## pre-process
+ind_rama_imrg <- ind_rama_imrg[complete.cases(ind_rama_imrg)]
+ind_rama_imrg <- ind_rama_imrg[, .(lat, lon, date, imrg_e, imrg_l, imrg_f, obs = ind_rama, sname)]
+ind_rama_imrg_long <- melt(ind_rama_imrg, c("lat", "lon", "date", "sname", "obs"), 
+                           value.name = "imrg_rf", variable.name = "imrg_run")
+
+atln_pirata_imrg <- atln_pirata_imrg[complete.cases(atln_pirata_imrg)]
+atln_pirata_imrg <- atln_pirata_imrg[, .(lat, lon, date, imrg_e, imrg_l, imrg_f, obs = atln_pirata, sname)]
+atln_pirata_imrg_long <- melt(atln_pirata_imrg, c("lat", "lon", "date", "sname", "obs"), 
+                              value.name = "imrg_rf", variable.name = "imrg_run")
+
+east_pacf_tao_imrg <- pacf_tao_imrg[lon < 0]
+east_pacf_tao_imrg <- east_pacf_tao_imrg[complete.cases(east_pacf_tao_imrg)]
+east_pacf_tao_imrg <- east_pacf_tao_imrg[, .(lat, lon, date, imrg_e, imrg_l, imrg_f, obs = pacf_tao, sname)]
+east_pacf_tao_imrg_long <- melt(east_pacf_tao_imrg, c("lat", "lon", "date", "sname", "obs"), 
+                                value.name = "imrg_rf", variable.name = "imrg_run")
+
+west_pacf_tao_imrg <- pacf_tao_imrg[lon >= 0]
+west_pacf_tao_imrg <-west_pacf_tao_imrg[complete.cases(west_pacf_tao_imrg)]
+west_pacf_tao_imrg <- west_pacf_tao_imrg[, .(lat, lon, date, imrg_e, imrg_l, imrg_f, obs = pacf_tao, sname)]
+west_pacf_tao_imrg_long <- melt(west_pacf_tao_imrg, c("lat", "lon", "date", "sname", "obs"), 
+                                value.name = "imrg_rf", variable.name = "imrg_run")
+
+
+# estimate the metrics
+
+thld <- 1 #change according to the requirements
+
+catmet_ind <- catmet_stats(ind_rama_imrg_long, thld)
+catmet_ind[, `:=`(ocn = factor("Indian"))]
+
+catmet_atln <- catmet_stats(atln_pirata_imrg_long, thld)
+catmet_atln[, `:=`(ocn = factor("Atlantic"))]
+
+catmet_east_pacf <- catmet_stats(east_pacf_tao_imrg_long, thld)
+catmet_east_pacf[, `:=`(ocn = factor("East Pacific"))]
+
+catmet_west_pacf <- catmet_stats(west_pacf_tao_imrg_long, thld)
+catmet_west_pacf[, `:=`(ocn = factor("West Pacific"))]
+
+
+catmet_all <- rbind(catmet_ind, catmet_atln, catmet_east_pacf, catmet_west_pacf)
+
+
+# plot ----------------------------------------------------------------
+
+colset_4 <-  c("#D35C37", "#BF9A77", "#D6C6B9", "#97B8C2")
+mycol_continent5 <- c( "#00B0F6", "#A3A500", "#00BF7D", "#e07b39", 
+                                "#80391e") 
+                                
+met_all_plot <- melt(catmet_all, c("sname", "imrg_run", "ocn"))
+
+#levels(met_all_plot$variable) <- c("Bias (mm/day)", "RMSE (mm/day)", "MAE (mm/day)", "COR", "POD",  "FAR", "CSI")
+levels(met_all_plot$imrg_run) <- c("IMERG-E", "IMERG-L", "IMERG-F")
+levels(met_all_plot$ocn) <- c("Indian", "Atlantic", "East Pacific", "West Pacific")
+
+ggplot(met_all_plot, aes(ocn, value, fill = imrg_run)) + 
+  geom_boxplot() + 
+  facet_wrap(~variable, scales = "free_y", ncol = 3) + 
+  scale_fill_manual(values = c("808000",  "#D35C37", "#6590bb")) + 
+  #scale_fill_manual(values = mycol_continent5[c(4, 3, 2, 1)]) + 
+  #scale_fill_manual(values = c("#b64925", "808000", "#6590bb")) + 
+  labs(x = "", y = "") + 
+  theme_small + # for presentation slides
+  theme(legend.position = "bottom",
+        legend.title = element_blank()) +
+  theme(strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'),
+        axis.text.x = element_text(angle = 30, hjust = 0.8, vjust = 0.9))
+#strip.text.x = element_text(size = 12))
+
+ggsave("results/supp_fig/boxplot_metrices_threshold_1mm.png",
+       width = 7.2, height = 5.5, units = "in", dpi = 600)
