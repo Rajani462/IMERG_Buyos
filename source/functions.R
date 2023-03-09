@@ -145,6 +145,43 @@ extract_grids <- function(file, points){
 }
 
 
+# function to estimate the volumetric & categeorical scores----------------------------------------------------------------
+
+
+vol_stats <- function(x){ 
+  x[, .(ref_mean = mean(obs, na.rm = TRUE), 
+        bias = sum(imrg_rf - obs)/.N, 
+        rbias = ((sum(imrg_rf - obs)/.N)/mean(obs, na.rm = TRUE)),
+        rbias2 = ((sum(imrg_rf - obs)/.N)/mean(obs, na.rm = TRUE))*100,
+        rmse = sqrt(sum((imrg_rf - obs)^2)/.N), 
+        nrmse = (sqrt(sum((imrg_rf - obs)^2)/.N)/mean(obs, na.rm = TRUE)), 
+        nrmse2 = (sqrt(sum((imrg_rf - obs)^2)/.N)/sqrt(sum(obs)))*100, 
+        mae = sum(abs(imrg_rf - obs))/.N, 
+        nmae = ((sum(abs(imrg_rf - obs))/.N) / mean(obs, na.rm = TRUE)), 
+        nmae2 = ((sum(abs(imrg_rf - obs))/.N) / IQR(obs, na.rm = TRUE))*100,
+        cor = cor(imrg_rf, obs)), by = .(sname, imrg_run)]
+}
+
+
+catmet_stats <- function(dt, thld){ 
+  
+  cat_metric_f <- dt[imrg_rf >= thld & obs >= thld, rf_class := factor('H')]
+  cat_metric_f[imrg_rf < thld & obs >= thld, rf_class := factor('M')]
+  cat_metric_f[imrg_rf >= thld & obs < thld, rf_class := factor('FA')]
+  cat_metric_f[imrg_rf < thld & obs < thld, rf_class := factor('CN')]
+  
+  cat_metric_daily_f <- cat_metric_f[, .N, by = .(rf_class, imrg_run, sname)]
+  cat_metric_wide <- dcast(cat_metric_daily_f, imrg_run + sname ~ rf_class)
+  
+  cat_met <- cat_metric_wide[, `:=`(POD = H /(H + M), FAR = FA / (H + FA), CSI = H / (H + M + FA), 
+                                    tot_events = (H + M + FA + CN)), by = .(sname, imrg_run)]
+  
+  cat_met <- cat_met[, .(sname, imrg_run, POD, FAR, CSI)]
+  
+  return(cat_met)
+  
+}
+
 # generate seasonal precipitation (sum) from monthly ----------------------
 
 add_seasons <- function(dt){
