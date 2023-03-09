@@ -1,6 +1,7 @@
 source('./source/libs.R')
 source('./source/themes.R')
 source('./source/palettes.R')
+source('./source/functions.R')
 
 #### read the datasets
 
@@ -10,26 +11,17 @@ ind_rama_imrg <- readRDS("./data/ind_rama_imrg.rds")
 
 unique(ind_rama_imrg, by = "sname")
 ind_rama_imrg <- ind_rama_imrg[complete.cases(ind_rama_imrg)]
-ind_rama_imrg <- ind_rama_imrg[, .(lat, lon, date, imrg_e, imrg_l, imrg_f, ind_rama, sname)]
+ind_rama_imrg <- ind_rama_imrg[, .(lat, lon, date, imrg_e, imrg_l, imrg_f, obs = ind_rama, sname)]
 summary(ind_rama_imrg)
 
 
 # volumetric_metrices Biuas, RMSE, MAE -----------------------------------------
 
-ind_rama_imrg_long <- melt(ind_rama_imrg, c("lat", "lon", "date", "sname", "ind_rama"), 
+ind_rama_imrg_long <- melt(ind_rama_imrg, c("lat", "lon", "date", "sname", "obs"), 
                       value.name = "imrg_rf", variable.name = "imrg_run")
 
-volmet_ind <- ind_rama_imrg_long[, .(ref_mean = mean(ind_rama, na.rm = TRUE), 
-                                     bias = sum(imrg_rf - ind_rama)/.N, 
-                                     pbias = ((sum(imrg_rf - ind_rama))/sum(ind_rama))*100,
-                                     rbias = ((sum(imrg_rf - ind_rama)/.N)/mean(ind_rama, na.rm = TRUE))*100,
-                                     rmse = sqrt(sum((imrg_rf - ind_rama)^2)/.N), 
-                                     #rrmse = (sqrt(sum((imrg_rf - ind_rama)^2)/.N)/mean(ind_rama, na.rm = TRUE))*100, 
-                                     rrmse = (sqrt(sum((imrg_rf - ind_rama)^2)/.N)/sqrt(sum(ind_rama)))*100, 
-                                     mae = sum(abs(imrg_rf - ind_rama))/.N, 
-                                     rmae = ((sum(abs(imrg_rf - ind_rama))/.N) / mean(ind_rama, na.rm = TRUE))*100,
-                                     cor = cor(imrg_rf, ind_rama), 
-                                     ocn = factor('ind')), by = .(sname, imrg_run)]
+volmet_ind <- vol_stats(ind_rama_imrg_long)
+volmet_ind[, `:=`(ocn = factor("Indian"))]
 
 ### plot
 
@@ -53,23 +45,12 @@ ggsave("results/figures/volmet_ind.png",
 
 # categorical_matrices_POD,FAR,CSI ----------------------------------------
 
-catmet_ind <- ind_rama_imrg_long[imrg_rf >= 0.1 & ind_rama >= 0.1, rf_class := factor('H')]
-catmet_ind[imrg_rf < 0.1 & ind_rama >= 0.1, rf_class := factor('M')]
-catmet_ind[imrg_rf >= 0.1 & ind_rama < 0.1, rf_class := factor('FA')]
-catmet_ind[imrg_rf <= 0.1 & ind_rama <= 0.1, rf_class := factor('CN')]
-
-
-catmet_ind2 <- catmet_ind[, .N, by = .(rf_class, sname, imrg_run)]
-catmet_ind_wide <- dcast(catmet_ind2,  sname + imrg_run ~ rf_class)
-
-catmet_ind_wide[, `:=`(POD = H /(H + M), FAR = FA / (H + FA), CSI = H / (H + M + FA), 
-                              tot_events = (H + M + FA + CN), ocn = factor('ind')), 
-                      by = .(sname, imrg_run)]
-
+catmet_ind <- catmet_stats(ind_rama_imrg_long, 0.1)
+catmet_ind[, `:=`(ocn = factor("Indian"))]
 ### plot
 
-catmet_ind_plot <- catmet_ind_wide[, .(sname, imrg_run, POD, FAR, CSI)]
-catmet_ind_plot <- melt(catmet_ind_plot, c("sname", "imrg_run"))
+
+catmet_ind_plot <- melt(catmet_ind, c("sname", "imrg_run", "ocn"))
 
 ggplot(catmet_ind_plot, aes(fill = imrg_run, y = value, x = sname)) + 
   geom_bar(position="dodge", stat="identity") + 
@@ -84,7 +65,7 @@ ggsave("results/figures/catmet_ind.png",
 
 # save the datasets ------------------------------------------------
 
-metrics_ind <- volmet_ind[catmet_ind_wide, on = .(sname, imrg_run, ocn)]
+metrics_ind <- volmet_ind[catmet_ind, on = .(sname, imrg_run, ocn)]
 saveRDS(metrics_ind, "./data/metrics_ind.rds")
 
 ############################################
