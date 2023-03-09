@@ -1,3 +1,4 @@
+# plot the spatial distribution of relative metrics
 
 source('./source/libs.R')
 source('./source/themes.R')
@@ -38,7 +39,11 @@ lat_lon <- all_stations[, .(lat, lon, sname, qrn)]
 met_latlon <- all_metrcis[lat_lon, on = 'sname']
 met_latlon <- met_latlon[complete.cases(met_latlon), ]
 
-met_latlon <- setnames(met_latlon, c("bias", "pbias", "rbias", "rmse", "nrmse", "mae"), c("BIAS", "PBIAS", "RBIAS", "RMSE", "NRMSE", "MAE"))
+met_latlon <- met_latlon[complete.cases(met_latlon), ]
+
+met_latlon <- met_latlon[, .(lat, lon, imrg_run, rbias, nrmse, nmae, ocn)]
+
+met_latlon <- setnames(met_latlon, c("rbias", "nrmse", "nmae"), c("RBIAS", "NRMSE", "NMAE"))
 
 
 
@@ -54,7 +59,7 @@ levels(met_latlon$ocn)
 # volumetric -----------------------------------------------------------
 
 
-vol_met <- met_latlon[imrg_run == 'imrg_f', .(lat, lon, BIAS, RBIAS, RMSE, NRMSE, MAE, ocn)]
+vol_met <- met_latlon[imrg_run == 'imrg_f', .(lat, lon, RBIAS, NRMSE, NMAE, ocn)]
 
 vol_met <- vol_met[, lapply(.SD, round, 2), by = .(lat, lon, ocn)]
 
@@ -77,7 +82,7 @@ ind_bias <- ggplot(vol_df$RBIAS)+
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_fermenter_custom(name = "Bias", pal, breaks =  c(-1, 0, 0.5, 1, 1.5, 2), limits = c(-6.3, 25.69)) + 
+  scale_color_fermenter_custom(name = "RBIAS\n(mm/day)", pal, breaks =  c(0, 0.5, 1, 1.5, 2), limits = c(-0.5, 25.69)) + 
   theme_small + 
   ggtitle("Indian") + 
   theme(axis.title.y = element_blank(), 
@@ -97,7 +102,7 @@ west_bias <- atln_bias %+% vol_df$BIAS + coord_sf(ylim = c(-20, 20), xlim = c(13
   
 
 
-bias <- ggarrange(ind_bias, atln_bias, east_bias, west_bias, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.42))
+bias <- ggarrange(ind_bias, atln_bias, east_bias, west_bias, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.46))
 
 
 ### RMSE
@@ -107,19 +112,19 @@ ind_rmse <- ggplot(vol_df$NRMSE)+
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_fermenter_custom(name = "RMSE", pal, breaks = c(0.8, 1, 1.5, 2, 2.5, 3), limits = c(0.8, 5.44)) + 
+  scale_color_fermenter_custom(name = "NRMSE\n(mm/day)", pal, breaks = c(3, 4, 5, 6, 7), limits = c(1.94, 133.56)) + 
   theme_small + 
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
-        axis.text.x=element_blank(), 
+        #axis.text.x=element_blank(), 
         legend.position = "none")
 
 
 atln_rmse <- ind_rmse + coord_sf(ylim = c(-20, 20), xlim = c(-45, 0)) + theme(axis.text.y=element_blank())
 
-east_rmse <- atln_rmse + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) #+ 
-  # theme(axis.text.x=element_text(color=c("black","transparent","black","transparent",
-  #                                        "black","transparent","black","transparent","black")))
+east_rmse <- atln_rmse + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) + 
+  theme(axis.text.x=element_text(color=c("transparent","black","transparent","black",
+                                         "transparent","black","transparent","black","transparent")))
 
 west_rmse <- atln_rmse %+% vol_df$rmse + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
   theme(legend.position = "right", legend.key.width = unit(0.5, "cm"))
@@ -128,7 +133,17 @@ west_rmse <- atln_rmse %+% vol_df$rmse + coord_sf(ylim = c(-20, 20), xlim = c(13
   #guides(colour = guide_coloursteps(show.limits = FALSE))
 
 
-rmse <- ggarrange(ind_rmse, atln_rmse, east_rmse, west_rmse, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.42))
+rmse <- ggarrange(ind_rmse, atln_rmse, east_rmse, west_rmse, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.44))
+
+
+ggarrange(bias, rmse, nrow = 2, align = "hv", heights = c(1.3, 1))
+
+
+ggsave("results/supp_fig/Relative_BIAS_RMSE.png",
+       width = 7.6, height = 4.0, units = "in", dpi = 600)
+
+
+##########################################################################################
 
 
 
