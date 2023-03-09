@@ -76,5 +76,27 @@ ggsave("results/paper_fig/spatil_mean_dist.png",width = 8.2, height = 3.3,
        units = "in", dpi = 600)
 
 
+# revising based on reviwer_3 comment (use only a single color bar)
+
+ggplot(mean_2001_20_ocn) + 
+  geom_tile(aes(lon, lat, fill = mean_rf)) + 
+  scale_fill_gradientn(colours = c("yellow", "green", "blue")) +
+  coord_sf(ylim = c(-25, 25), expand = c(0, 0)) +
+  labs(x = "", y = "", fill = "IMERG (mm/day)") +
+  geom_polygon(data = name_shp,
+               aes(x = long, y = lat, group = group), fill="white", color="black") + 
+  labs(color ="Buoys (mm/day)") +
+  theme_generic +
+  theme(legend.position = "bottom", legend.key.width = unit(1.1, "cm"),
+        legend.key.height = unit(0.5, 'cm')) + 
+  geom_point(data = ind_atln_pacf, aes(lon, lat, color = buoys_rf), shape = 21, size = 2.0) +
+  geom_point(data = ind_atln_pacf, aes(lon, lat, color = buoys_rf), color = "black", shape = 21, size = 2.5) +
+  geom_point(data = ind_atln_pacf, aes(lon, lat, color = buoys_rf), shape = 19, size = 1.5) + 
+  scale_colour_gradientn(colours = c("yellow", "green")) + 
+labs(color ="Precipitation (mm/day)") +
+  theme_generic +
+  theme(legend.position = "bottom", legend.key.width = unit(1.1, "cm"),
+        legend.key.height = unit(0.5, 'cm'))
+
 ###################################################################################
 
