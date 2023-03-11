@@ -1,3 +1,4 @@
+# Plot the spatial distribution statistical metrics across the tropical oceans for each station
 
 source('./source/libs.R')
 source('./source/themes.R')
@@ -38,14 +39,10 @@ lat_lon <- all_stations[, .(lat, lon, sname, qrn)]
 met_latlon <- all_metrcis[lat_lon, on = 'sname']
 met_latlon <- met_latlon[complete.cases(met_latlon), ]
 
-met_latlon <- setnames(met_latlon, c("bias", "rmse", "mae"), c("BIAS", "RMSE", "MAE"))
-
+met_latlon <- setnames(met_latlon, c("bias", "rmse", "cor"), c("BIAS", "RMSE", "COR"))
 
 
 levels(met_latlon$ocn)
-
-#met_latlon[ocn == "pacf" & lon < 0, ocn := factor("east_pacf")]
-#met_latlon[ocn == "pacf", ocn := factor("west_pacf")]
 
 # plot the spatial plot of variuos metrices -------------------------------
 
@@ -166,7 +163,7 @@ ggsave("results/paper_fig/POD_FAR_CSI.png",
 # volumetric -----------------------------------------------------------
 
 
-vol_met <- met_latlon[imrg_run == 'imrg_f', .(lat, lon, BIAS, RMSE, MAE, ocn)]
+vol_met <- met_latlon[imrg_run == 'imrg_f', .(lat, lon, BIAS, RMSE, COR, ocn)]
 
 vol_met <- vol_met[, lapply(.SD, round, 2), by = .(lat, lon, ocn)]
 
@@ -189,7 +186,7 @@ ind_bias <- ggplot(vol_df$BIAS)+
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_fermenter_custom(name = "Bias (mm/day)", pal, breaks =  c(-1, 0, 1, 2, 3, 4, 5), limits = c(-1.10, 4.680)) + 
+  scale_color_fermenter_custom(name = "Bias\n(mm/day)", pal, breaks =  c(-1, 0, 1, 2, 3, 4, 5), limits = c(-1.10, 4.680)) + 
   theme_small + 
   ggtitle("Indian") + 
   theme(axis.title.y = element_blank(), 
@@ -209,7 +206,7 @@ west_bias <- atln_bias %+% vol_df$BIAS + coord_sf(ylim = c(-20, 20), xlim = c(13
   
 
 
-bias <- ggarrange(ind_bias, atln_bias, east_bias, west_bias, ncol = 4, align = "hv", widths = c(1.24, 1, 1, 1.54))
+bias <- ggarrange(ind_bias, atln_bias, east_bias, west_bias, ncol = 4, align = "hv", widths = c(1.24, 1, 1, 1.42))
 
 
 ### RMSE
@@ -219,7 +216,7 @@ ind_rmse <- ggplot(vol_df$RMSE)+
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_fermenter_custom(name = "RMSE (mm/day)", pal, breaks = c(0, 5, 10, 15, 20, 25), limits = c(0.5, 26.34)) + 
+  scale_color_fermenter_custom(name = "RMSE\n(mm/day)", pal, breaks = c(0, 5, 10, 15, 20, 25), limits = c(0.5, 26.34)) + 
   theme_small + 
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
@@ -240,18 +237,18 @@ west_rmse <- atln_rmse %+% vol_df$rmse + coord_sf(ylim = c(-20, 20), xlim = c(13
   #guides(colour = guide_coloursteps(show.limits = FALSE))
 
 
-rmse <- ggarrange(ind_rmse, atln_rmse, east_rmse, west_rmse, ncol = 4, align = "hv", widths = c(1.24, 1, 1, 1.60))
+rmse <- ggarrange(ind_rmse, atln_rmse, east_rmse, west_rmse, ncol = 4, align = "hv", widths = c(1.24, 1, 1, 1.42))
 
 
 
-### MAE
+### COR
 
-ind_mae <- ggplot(vol_df$MAE)+
+ind_mae <- ggplot(vol_df$COR)+
   geom_point(aes(lon, lat, color = value), size = 1.5) +
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_fermenter_custom(name = "MAE (mm/day)", pal, breaks =  c(0, 2, 4, 6, 8), limits = c(0.1, 9.32)) + 
+  scale_color_fermenter_custom(name = "COR\n(mm/day)", pal, breaks =  c(0.3, 0.4, 0.5, 0.6, 0.7), limits = c(0.2, 0.78)) + 
   theme_small +  
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
@@ -272,14 +269,14 @@ west_mae <- atln_mae %+% vol_df$mae + coord_sf(ylim = c(-20, 20), xlim = c(135, 
   #guides(colour = guide_coloursteps(show.limits = FALSE))
 
 
-mae <- ggarrange(ind_mae, atln_mae, east_mae, west_mae, ncol = 4, align = "hv", widths = c(1.24, 1, 1, 1.54))
+mae <- ggarrange(ind_mae, atln_mae, east_mae, west_mae, ncol = 4, align = "hv", widths = c(1.24, 1, 1, 1.43))
 
 
-ggarrange(bias, rmse, mae, nrow = 3, align = "hv", heights = c(1.29, 1.1,  1.27))
+ggarrange(bias, rmse, mae, nrow = 3, align = "hv", heights = c(1.27, 1.1,  1.27))
 
 
-ggsave("results/paper_fig/BIAS_RMSE_MAE.png",
-       width = 9.2, height = 5.9, units = "in", dpi = 600)
+ggsave("results/paper_fig/BIAS_RMSE_COR.png",
+       width = 8.5, height = 5.9, units = "in", dpi = 600)
 
 ################################################################################################
 

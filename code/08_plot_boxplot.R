@@ -36,7 +36,7 @@ levels(met_all_plot$variable) <- c("Bias (mm/day)", "RMSE (mm/day)", "MAE (mm/da
 levels(met_all_plot$imrg_run) <- c("IMERG-E", "IMERG-L", "IMERG-F")
 levels(met_all_plot$ocn) <- c("Indian", "Atlantic", "East Pacific", "West Pacific")
 
-plot_metrics <- ggplot(met_all_plot[variable != "COR"], aes(ocn, value, fill = imrg_run)) + 
+plot_metrics <- ggplot(met_all_plot[variable != "MAE (mm/day)"], aes(ocn, value, fill = imrg_run)) + 
   geom_boxplot() + 
   facet_wrap(~variable, scales = "free_y", ncol = 3) + 
   scale_fill_manual(values = c("808000",  "#D35C37", "#6590bb")) + 
