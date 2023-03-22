@@ -128,7 +128,7 @@ ind_alt_pacf <- rbind(ind_met_dt, atln_met_dt, east_pacf_met_dt, west_pacf_met_d
 ind_alt_pacf_long <- melt(ind_alt_pacf, c("variable", "thresh", "ocn"), variable.name = "metrices")
 
 
-ggplot(ind_alt_pacf_long[variable == "IMERG-F"], aes(factor(thresh), value, col = ocn, group = ocn)) + 
+plot_thres <- ggplot(ind_alt_pacf_long[variable == "IMERG-F"], aes(factor(thresh), value, col = ocn, group = ocn)) + 
   geom_line() + 
   geom_point() + 
   facet_grid(~metrices) + 
@@ -138,23 +138,15 @@ ggplot(ind_alt_pacf_long[variable == "IMERG-F"], aes(factor(thresh), value, col 
   #coord_cartesian(xlim=c(1, 100)) + 
   theme_small + 
   theme(legend.title = element_blank(), legend.position = "bottom") + 
-  #theme(legend.text = element_text(family = font, size = 12, color = "#222222")) + 
-  #theme(axis.text.x = element_text(size = 12)) + 
-  # theme(axis.text.x = element_text(margin = unit(c(0.4, 0, 0, 0), "cm"), 
-  #                                  family = font, size = 10, color = "#222222"), 
-  #       axis.title.x = element_text(margin = unit(c(0.4, 0, 0, 0), "cm"), 
-  #                                   family = font, size = 12, color = "#222222"),
-  #       axis.title.y = element_text(margin = unit(c(0, 0.3, 0, 0), "cm"), 
-  #                                   family = font, size = 12, color = "#222222"), 
-  #       axis.text.y = element_text(margin = unit(c(0, 0.5, 0, 0), "cm"), 
-  #                                  family = font, size = 10, color = "#222222"), 
-  #       legend.text = element_text(family = font, size = 14, color = "#222222")) + 
-  # theme(strip.background = element_rect(fill = "white"), 
-  #       strip.text = element_text(colour = 'Black'), 
-  #       strip.text.x = element_text(size = 12))
+  theme(strip.background = element_rect(fill = "white")) + 
+  theme(axis.text.x=element_text(color=c("black","transparent","black",
+                                         "transparent","black","transparent","black","transparent")))
+
+
 
 ggsave("results/paper_fig/cat_met_threshold_cross_scale.png",
        width = 7.2, height = 5.2, units = "in", dpi = 600)
+
 
 #############################################################
 
@@ -230,7 +222,7 @@ met_all_plot <- melt(catmet_all, c("sname", "imrg_run", "ocn"))
 levels(met_all_plot$imrg_run) <- c("IMERG-E", "IMERG-L", "IMERG-F")
 levels(met_all_plot$ocn) <- c("Indian", "Atlantic", "East Pacific", "West Pacific")
 
-ggplot(met_all_plot, aes(ocn, value, fill = imrg_run)) + 
+box_plot <- ggplot(met_all_plot, aes(ocn, value, fill = imrg_run)) + 
   geom_boxplot() + 
   facet_wrap(~variable, scales = "free_y", ncol = 3) + 
   scale_fill_manual(values = c("808000",  "#D35C37", "#6590bb")) + 
@@ -247,3 +239,18 @@ ggplot(met_all_plot, aes(ocn, value, fill = imrg_run)) +
 
 ggsave("results/supp_fig/boxplot_metrices_threshold_1mm.png",
        width = 7.2, height = 5.5, units = "in", dpi = 600)
+
+
+ggarrange(plot_thres, box_plot, ncol = 1, nrow = 2,
+          labels = c("a)", "b)"), legend = "right")
+
+ggsave("results/supp_fig/box&lineplot_metrices_threshold_1mm.png",
+       width = 7.2, height = 5.5, units = "in", dpi = 600)
+
+
+##################################################################
+
+ind_rama_imrg[obs < 0 ]
+
+ind_rama_imrg[imrg_f < 0.1]
+

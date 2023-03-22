@@ -418,8 +418,11 @@ vol_cat_met <- volmet_all[catmet_all, on = .(sname, imrg_run, ocn)]
 vol_cat_long <- melt(vol_cat_met, c("sname", "imrg_run", "ocn", "ref_mean"))
 
 
-to_plot <- vol_cat_met[, .(sname, imrg_run, ocn, ref_mean, bias, rmse, mae, POD, FAR, CSI)]
+to_plot <- vol_cat_met[, .(sname, imrg_run, ocn, ref_mean, Bias = bias, RMSE = rmse, COR = cor, POD, FAR, CSI)]
 to_plot_long <- melt(to_plot, c("sname", "imrg_run", "ocn", "ref_mean"))
+
+levels(to_plot_long$imrg_run) <- c("IMERG-E", "IMERG-L", "IMERG-F")
+levels(to_plot_long$variable) <- c("Bias (mm/day)", "RMSE (mm/day)", "COR" , "POD", "FAR",  "CSI")
 
 ggplot(to_plot_long , aes(ocn, value, fill = imrg_run)) + 
   geom_boxplot() + 
@@ -433,5 +436,5 @@ ggplot(to_plot_long , aes(ocn, value, fill = imrg_run)) +
         strip.text = element_text(colour = 'Black'),
         axis.text.x = element_text(angle = 30, hjust = 0.8, vjust = 0.9))
 
-ggsave("results/supp_fig/boxplot_metrices_highquality.png",
+ggsave("results/supp_fig/suppl_boxplot_metrices_highquality_data.png",
        width = 7.2, height = 6.5, units = "in", dpi = 600)

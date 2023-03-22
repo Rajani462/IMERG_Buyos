@@ -3,7 +3,7 @@ source('./source/functions.R')
 
 ################
 
-ind_rama_files <- list.files("./data/raw/buoys/rama", pattern = "cdf$", full.names = TRUE) %>% as.list()
+ind_rama_files <- list.files("./data/raw/buoys/rama_indian", pattern = "cdf$", full.names = TRUE) %>% as.list()
 atln_pirata_files <- list.files("./data/raw/buoys/pirata_atlantic", pattern = "cdf$", full.names = TRUE) %>% as.list()
 pacf_tao_files <- list.files("./data/raw/buoys/tao_pacific", pattern = "cdf$", full.names = TRUE) %>% as.list()
 

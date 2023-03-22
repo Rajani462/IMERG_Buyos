@@ -51,6 +51,8 @@ plot_metrics <- ggplot(met_all_plot[variable != "MAE (mm/day)"], aes(ocn, value,
         axis.text.x = element_text(angle = 30, hjust = 0.8, vjust = 0.9))
 #strip.text.x = element_text(size = 12))
 
+plot_metrics <- plot_metrics + scale_y_continuous(n.breaks = 7)
+
 ggsave("results/paper_fig/boxplot_metrices.png",
        width = 7.2, height = 5.5, units = "in", dpi = 600)
 
@@ -58,7 +60,7 @@ ggsave("results/paper_fig/boxplot_metrices.png",
 ## assign labels for sub-panels
 
 tag_facet2 <- function(p, open = "(", close = ")", tag_pool = letters, x = -Inf, y = Inf, 
-                       hjust = -0.5, vjust = 1.5, fontface = 2, family = font, face = "bold", ...) {
+                       hjust = -0.5, vjust = 1.9, fontface = 2, family = font, face = "bold", ...) {
   
   gb <- ggplot_build(p)
   lay <- gb$layout$layout
@@ -68,14 +70,14 @@ tag_facet2 <- function(p, open = "(", close = ")", tag_pool = letters, x = -Inf,
 }
 
 
-tag_facet2(plot_metrics, open = NULL, hjust = -0.2, vjust = 0.9, fontface = 1, size = 3.5)
+tag_facet2(plot_metrics, open = NULL, hjust = -0.2, vjust = 1.2, fontface = 1, size = 3.5)
 ggsave("results/paper_fig/boxplot_metrices.png",
        width = 7.2, height = 5.5, units = "in", dpi = 600)
 
 
-# with correlation -----------------------------------------------------
+# with MAE -----------------------------------------------------
 
-ggplot(met_all_plot[variable != "MAE" ], aes(ocn, value, fill = imrg_run)) + 
+ggplot(met_all_plot[variable != "COR" ], aes(ocn, value, fill = imrg_run)) + 
   geom_boxplot() + 
   facet_wrap(~variable, scales = "free_y", ncol = 3) + 
   scale_fill_manual(values = c("808000",  "#D35C37", "#6590bb")) + 
@@ -91,6 +93,27 @@ ggplot(met_all_plot[variable != "MAE" ], aes(ocn, value, fill = imrg_run)) +
 
 
 ggsave("results/boxplot_metrices.png",
+       width = 7.2, height = 5.5, units = "in", dpi = 600)
+
+
+# only with MAE for supplementary figure -----------------------------------------------------
+
+ggplot(met_all_plot[variable == "MAE (mm/day)"], aes(ocn, value, fill = imrg_run)) + 
+  geom_boxplot() + 
+  facet_wrap(~variable, scales = "free_y", ncol = 1) + 
+  scale_fill_manual(values = c("808000",  "#D35C37", "#6590bb")) + 
+  #scale_fill_manual(values = mycol_continent5[c(4, 3, 2, 1)]) + 
+  #scale_fill_manual(values = c("#b64925", "808000", "#6590bb")) + 
+  labs(x = "", y = "") + 
+  theme_small + # for presentation slides
+  theme(legend.position = "bottom",
+        legend.title = element_blank()) +
+  theme(strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black'),
+        axis.text.x = element_text(angle = 0, hjust = 0.8, vjust = 0.9))
+
+
+ggsave("results/supp_fig/supp_boxplot_MAE.png",
        width = 7.2, height = 5.5, units = "in", dpi = 600)
 
 

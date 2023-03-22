@@ -47,6 +47,7 @@ ggsave("results/figures/volmet_ind.png",
 
 catmet_ind <- catmet_stats(ind_rama_imrg_long, 0.1)
 catmet_ind[, `:=`(ocn = factor("Indian"))]
+
 ### plot
 
 

@@ -39,7 +39,7 @@ lat_lon <- all_stations[, .(lat, lon, sname, qrn)]
 met_latlon <- all_metrcis[lat_lon, on = 'sname']
 met_latlon <- met_latlon[complete.cases(met_latlon), ]
 
-met_latlon <- setnames(met_latlon, c("bias", "rmse", "cor"), c("BIAS", "RMSE", "COR"))
+met_latlon <- setnames(met_latlon, c("bias", "rmse", "cor", "mae"), c("BIAS", "RMSE", "COR", "MAE"))
 
 
 levels(met_latlon$ocn)
@@ -163,7 +163,7 @@ ggsave("results/paper_fig/POD_FAR_CSI.png",
 # volumetric -----------------------------------------------------------
 
 
-vol_met <- met_latlon[imrg_run == 'imrg_f', .(lat, lon, BIAS, RMSE, COR, ocn)]
+vol_met <- met_latlon[imrg_run == 'imrg_f', .(lat, lon, BIAS, RMSE, COR, MAE, ocn)]
 
 vol_met <- vol_met[, lapply(.SD, round, 2), by = .(lat, lon, ocn)]
 
@@ -171,7 +171,7 @@ plot_vol_met <- melt(vol_met, c("lat", "lon", "ocn"))
 
 vol_df <- split(plot_vol_met, f = plot_vol_met$variable)
 
-### Bias
+
 
 pal <- c("yellow2", "yellowgreen", "seagreen", "royalblue2", "darkorange2", "maroon3", "red3")
 
@@ -179,7 +179,7 @@ scale_color_fermenter_custom <- function(pal, na.value = "grey50", guide = "colo
   binned_scale("color", "fermenter", ggplot2:::binned_pal(scales::manual_pal(unname(pal))), na.value = na.value, guide = guide, ...)  
 }
 
-
+### Bias
 
 ind_bias <- ggplot(vol_df$BIAS)+
   geom_point(aes(lon, lat, color = value), size = 1.5) +
@@ -280,3 +280,37 @@ ggsave("results/paper_fig/BIAS_RMSE_COR.png",
 
 ################################################################################################
 
+# Supplementary figures --------------------------
+
+### MAE
+
+ind_mae <- ggplot(vol_df$MAE)+
+  geom_point(aes(lon, lat, color = value), size = 1.5) +
+  #facet_wrap(~ocn, ncol = 1) + 
+  geom_sf(data = shp, fill="#979797", color="white") + 
+  coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
+  scale_color_fermenter_custom(name = "MAE (mm/day)", pal, breaks =  c(0, 2, 4, 6, 8), limits = c(0.1, 9.32)) + 
+  theme_small +  
+  theme(axis.title.y = element_blank(), 
+        axis.title.x = element_blank(), 
+        legend.position = "none")
+
+
+atln_mae <- ind_mae + coord_sf(ylim = c(-20, 20), xlim = c(-45, 0)) + theme(axis.text.y=element_blank())
+
+east_mae <- atln_mae + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) + 
+  theme(axis.text.x=element_text(color=c("transparent","black","transparent","black",
+                                         "transparent","black","transparent","black","transparent")))
+
+
+west_mae <- atln_mae %+% vol_df$mae + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
+  theme(legend.position = "right", legend.key.width = unit(0.5, "cm"))
+#       legend.key.height = unit(0.4, 'cm'), 
+#       legend.title = element_blank()) + 
+#guides(colour = guide_coloursteps(show.limits = FALSE))
+
+
+mae <- ggarrange(ind_mae, atln_mae, east_mae, west_mae, ncol = 4, align = "hv", widths = c(1.28, 1, 1, 1.68))
+
+ggsave("results/supp_fig/supp_MAE_spatial_dist.png",
+       width = 7.5, height = 3.5, units = "in", dpi = 600)

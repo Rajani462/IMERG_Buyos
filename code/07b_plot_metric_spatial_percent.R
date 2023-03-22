@@ -116,7 +116,7 @@ ind_rmse <- ggplot(vol_df$NRMSE)+
   theme_small + 
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
-        #axis.text.x=element_blank(), 
+        axis.text.x=element_blank(), 
         legend.position = "none")
 
 
@@ -127,10 +127,37 @@ east_rmse <- atln_rmse + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) +
                                          "transparent","black","transparent","black","transparent")))
 
 west_rmse <- atln_rmse %+% vol_df$rmse + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
+  theme(legend.position = "right", legend.key.width = unit(0.5, "cm"), 
+        legend.key.height = unit(0.4, 'cm'),
+        legend.title = element_blank()) +
+  guides(colour = guide_coloursteps(show.limits = FALSE))
+
+### RMSE
+
+ind_mae <- ggplot(vol_df$NMAE)+
+  geom_point(aes(lon, lat, color = value), size = 1.5) +
+  #facet_wrap(~ocn, ncol = 1) + 
+  geom_sf(data = shp, fill="#979797", color="white") + 
+  coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
+  scale_color_fermenter_custom(name = "NMAE\n(mm/day)", pal, breaks = c(3, 4, 5, 6, 7), limits = c(1.94, 133.56)) + 
+  theme_small + 
+  theme(axis.title.y = element_blank(), 
+        axis.title.x = element_blank(), 
+        #axis.text.x=element_blank(), 
+        legend.position = "none")
+
+
+atln_mae <- ind_mae + coord_sf(ylim = c(-20, 20), xlim = c(-45, 0)) + theme(axis.text.y=element_blank())
+
+east_mae <- atln_mae + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) + 
+  theme(axis.text.x=element_text(color=c("transparent","black","transparent","black",
+                                         "transparent","black","transparent","black","transparent")))
+
+west_mae <- atln_mae %+% vol_df$mae + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
   theme(legend.position = "right", legend.key.width = unit(0.5, "cm"))
-  #       legend.key.height = unit(0.4, 'cm'), 
-  #       legend.title = element_blank()) + 
-  #guides(colour = guide_coloursteps(show.limits = FALSE))
+#       legend.key.height = unit(0.4, 'cm'), 
+#       legend.title = element_blank()) + 
+#guides(colour = guide_coloursteps(show.limits = FALSE))
 
 
 rmse <- ggarrange(ind_rmse, atln_rmse, east_rmse, west_rmse, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.44))

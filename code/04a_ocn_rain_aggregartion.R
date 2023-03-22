@@ -1,4 +1,5 @@
 source('./source/libs.R')
+library(rgdal)
 
 colset_4 <-  c("#D35C37", "#BF9A77", "#D6C6B9", "#97B8C2")
 
@@ -26,6 +27,21 @@ ocnrain_comb_1day <- ocnrain_comb[between(lon, 145, 150) & between(lat, 1, 10) &
 
 ocnrain_comb_aggrrain <- ocnrain_comb_1day[, .(rf_daily = sum(rf)/15.5), by = daily_date]
 
+#####
+ind_rama_imrg <- readRDS("./data/ind_rama_imrg.rds")
+atln_pirata_imrg <- readRDS("./data/atln_pirata_imrg.rds")
+pacf_tao_imrg <- readRDS("./data/pacf_tao_imrg.rds")
+
+###############
+
+ind <- ind_rama_imrg[, .(buoys_rf = mean(ind_rama, na.rm = TRUE)), by = .(lat, lon, sname)]
+atln <- atln_pirata_imrg[, .(buoys_rf = mean(atln_pirata, na.rm = TRUE)), by = .(lat, lon, sname)]
+pacf <- pacf_tao_imrg[, .(buoys_rf = mean(pacf_tao, na.rm = TRUE)), by = .(lat, lon, sname)]
+ind_atln_pacf <- rbind(ind, atln, pacf)
+
+dat_plot <- ind_atln_pacf
+
+
 ggplot(ocnrain_comb_1day) + 
   geom_point(aes(lon, lat)) + 
   #scale_fill_viridis(direction = -1, limits = c(0, 50)) + 
@@ -38,12 +54,13 @@ ggplot(ocnrain_comb_1day) +
   #scale_color_gradientn(colours = c("grey","orange", "red", "black"), limits = c(0, 14)) +  
   #breaks = c(0, 3, 6, 9, 12, 14)) +
   #labs(color ="Buoys (mm/day)") + 
+  labs(x = "Latitude", y = "Longitude") + 
   theme_generic + 
   theme(legend.position = "bottom", legend.key.width = unit(1.1, "cm"), 
         legend.key.height = unit(0.5, 'cm'))
 
 
-ggsave("results/paper_fig/ocnrain_buoys_pacf.png",
+ggsave("results/supp_fig/ocnrain_2016_11_13_pacf.png",
        width = 8.2, height = 5.3, units = "in", dpi = 600)
 
 
