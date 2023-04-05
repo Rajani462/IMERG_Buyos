@@ -100,7 +100,7 @@ ggplot(mean_2001_20_ocn) +
   theme(legend.position = "bottom", legend.key.width = unit(1.1, "cm"),
         legend.key.height = unit(0.5, 'cm'))
 
-ggsave("results/paper_fig/spatil_mean_dist.png", width = 8.2, height = 3.3, 
+ggsave("results/paper_fig/spatil_mean_dist.png", width = 8.9, height = 3.3, 
        units = "in", dpi = 600)
 ###################################################################################
 
