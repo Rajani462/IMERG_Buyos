@@ -37,9 +37,9 @@ all_metrcis <- rbind(ind_met, atln_met, east_pacf_met, west_pacf_met)
 lat_lon <- all_stations[, .(lat, lon, sname, qrn)]
 
 met_latlon <- all_metrcis[lat_lon, on = 'sname']
-met_latlon <- met_latlon[complete.cases(met_latlon), ]
+#met_latlon <- met_latlon[complete.cases(met_latlon), ]
 
-met_latlon <- met_latlon[complete.cases(met_latlon), ]
+#met_latlon <- met_latlon[complete.cases(met_latlon), ]
 
 met_latlon <- met_latlon[, .(lat, lon, imrg_run, rbias, nrmse, nmae, ocn)]
 
@@ -102,7 +102,7 @@ west_bias <- atln_bias %+% vol_df$BIAS + coord_sf(ylim = c(-20, 20), xlim = c(13
   
 
 
-bias <- ggarrange(ind_bias, atln_bias, east_bias, west_bias, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.46))
+bias <- ggarrange(ind_bias, atln_bias, east_bias, west_bias, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.44))
 
 
 ### RMSE
@@ -116,7 +116,7 @@ ind_rmse <- ggplot(vol_df$NRMSE)+
   theme_small + 
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
-        axis.text.x=element_blank(), 
+        #axis.text.x=element_blank(), 
         legend.position = "none")
 
 
@@ -126,20 +126,32 @@ east_rmse <- atln_rmse + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) +
   theme(axis.text.x=element_text(color=c("transparent","black","transparent","black",
                                          "transparent","black","transparent","black","transparent")))
 
-west_rmse <- atln_rmse %+% vol_df$rmse + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
-  theme(legend.position = "right", legend.key.width = unit(0.5, "cm"), 
-        legend.key.height = unit(0.4, 'cm'),
-        legend.title = element_blank()) +
-  guides(colour = guide_coloursteps(show.limits = FALSE))
 
-### RMSE
+west_rmse <- atln_rmse %+% vol_df$rmse + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
+  theme(legend.position = "right", legend.key.width = unit(0.5, "cm"))
+
+rmse <- ggarrange(ind_rmse, atln_rmse, east_rmse, west_rmse, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.44))
+
+
+
+ggarrange(bias, rmse, nrow = 2, align = "hv", heights = c(1.3, 1.2))
+
+ggsave("results/supp_fig/supp_relative_BIAS_RMSE1.png",
+       width = 8.2, height = 4.0, units = "in", dpi = 600)
+
+################################################################
+
+
+
+
+### MAE
 
 ind_mae <- ggplot(vol_df$NMAE)+
   geom_point(aes(lon, lat, color = value), size = 1.5) +
   #facet_wrap(~ocn, ncol = 1) + 
   geom_sf(data = shp, fill="#979797", color="white") + 
   coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_fermenter_custom(name = "NMAE\n(mm/day)", pal, breaks = c(3, 4, 5, 6, 7), limits = c(1.94, 133.56)) + 
+  scale_color_fermenter_custom(name = "NMAE\n(mm/day)", pal, breaks = c(1, 1.5, 2, 2.5, 3), limits = c(0.78, 63.76)) + 
   theme_small + 
   theme(axis.title.y = element_blank(), 
         axis.title.x = element_blank(), 
@@ -160,56 +172,19 @@ west_mae <- atln_mae %+% vol_df$mae + coord_sf(ylim = c(-20, 20), xlim = c(135, 
 #guides(colour = guide_coloursteps(show.limits = FALSE))
 
 
-rmse <- ggarrange(ind_rmse, atln_rmse, east_rmse, west_rmse, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.44))
+mae <- ggarrange(ind_mae, atln_mae, east_mae, west_mae, ncol = 4, align = "hv", widths = c(1.27, 1, 1, 1.44))
 
 
-ggarrange(bias, rmse, nrow = 2, align = "hv", heights = c(1.3, 1))
+ggarrange(bias, rmse, mae, nrow = 3, align = "hv", heights = c(1.3, 1, 1.2))
 
 
-ggsave("results/supp_fig/Relative_BIAS_RMSE.png",
-       width = 7.6, height = 4.0, units = "in", dpi = 600)
+ggsave("results/supp_fig/supp_relative_BIAS_RMSE_MAE.png",
+       width = 8.2, height = 6.5, units = "in", dpi = 600)
 
 
 ##########################################################################################
 
 
 
-### MAE
 
-ind_mae <- ggplot(vol_df$MAE)+
-  geom_point(aes(lon, lat, color = value), size = 1.5) +
-  #facet_wrap(~ocn, ncol = 1) + 
-  geom_sf(data = shp, fill="#979797", color="white") + 
-  coord_sf(ylim = c(-20, 20), xlim = c(55, 99)) + 
-  scale_color_fermenter_custom(name = "MAE", pal, breaks =  c(0, 2, 4, 6, 8), limits = c(0.1, 9.32)) + 
-  theme_small +  
-  theme(axis.title.y = element_blank(), 
-        axis.title.x = element_blank(), 
-        legend.position = "none")
-
-
-atln_mae <- ind_mae + coord_sf(ylim = c(-20, 20), xlim = c(-45, 0)) + theme(axis.text.y=element_blank())
-
-east_mae <- atln_mae + coord_sf(ylim = c(-20, 20), xlim = c(-168, -97)) + 
-  theme(axis.text.x=element_text(color=c("transparent","black","transparent","black",
-                                         "transparent","black","transparent","black","transparent")))
-
-
-west_mae <- atln_mae %+% vol_df$mae + coord_sf(ylim = c(-20, 20), xlim = c(135, 180)) + 
-  theme(legend.position = "right", legend.key.width = unit(0.5, "cm"))
-  #       legend.key.height = unit(0.4, 'cm'), 
-  #       legend.title = element_blank()) + 
-  #guides(colour = guide_coloursteps(show.limits = FALSE))
-
-
-mae <- ggarrange(ind_mae, atln_mae, east_mae, west_mae, ncol = 4, align = "hv", widths = c(1.26, 1, 1, 1.42))
-
-
-ggarrange(bias, rmse, mae, nrow = 3, align = "hv", heights = c(1.3, 1,  1.3))
-
-
-ggsave("results/paper_fig/Relative_BIAS_RMSE_MAE.png",
-       width = 7.6, height = 5.3, units = "in", dpi = 600)
-
-################################################################################################
 
