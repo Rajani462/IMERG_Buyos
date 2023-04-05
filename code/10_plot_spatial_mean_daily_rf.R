@@ -80,7 +80,8 @@ ggsave("results/paper_fig/spatil_mean_dist.png",width = 8.2, height = 3.3,
 
 ggplot(mean_2001_20_ocn) + 
   geom_tile(aes(lon, lat, fill = mean_rf)) + 
-  scale_fill_gradientn(colours = c("yellow", "green", "blue")) +
+  scale_fill_viridis(direction = -1) + 
+  #scale_fill_gradientn(colours = c("yellow", "green", "blue"), breaks = c(5, 10, 15)) +
   coord_sf(ylim = c(-25, 25), expand = c(0, 0)) +
   labs(x = "", y = "", fill = "Precipitation (mm/day)") +
   geom_polygon(data = name_shp,
@@ -89,16 +90,17 @@ ggplot(mean_2001_20_ocn) +
   theme_generic +
   theme(legend.position = "bottom", legend.key.width = unit(1.1, "cm"),
         legend.key.height = unit(0.5, 'cm')) + 
-  geom_point(data = ind_atln_pacf, aes(lon, lat, color = buoys_rf), shape = 21, size = 0.8) +
-  geom_point(data = ind_atln_pacf, aes(lon, lat, color = buoys_rf), color = "black", shape = 21, size = 0.9) +
-  geom_point(data = ind_atln_pacf, aes(lon, lat, color = buoys_rf), shape = 19, size = 0.8) + 
-  scale_colour_gradientn(colours = c("yellow", "green")) + 
-labs(color ="Precipitation (mm/day)") +
+  geom_point(data = ind_atln_pacf, aes(lon, lat, color = buoys_rf), shape = 21, size = 0.8, show.legend = FALSE) +
+  geom_point(data = ind_atln_pacf, aes(lon, lat, color = buoys_rf), color = "black", shape = 21, size = 0.9, stroke = 0.8, show.legend = FALSE) +
+  geom_point(data = ind_atln_pacf, aes(lon, lat, color = buoys_rf), shape = 19, size = 0.8, show.legend = FALSE) + 
+  #scale_colour_gradientn(colours = c("yellow", "green")) + 
+  scale_color_viridis(direction = -1, begin = 0.43, end = 1.0) + 
+  labs(color ="Precipi (mm/day)") +
   theme_generic +
   theme(legend.position = "bottom", legend.key.width = unit(1.1, "cm"),
         legend.key.height = unit(0.5, 'cm'))
 
-ggsave("results/paper_fig/spatil_mean_dist_rev1.png",width = 8.2, height = 3.3, 
+ggsave("results/paper_fig/spatil_mean_dist.png", width = 8.2, height = 3.3, 
        units = "in", dpi = 600)
 ###################################################################################
 
