@@ -124,7 +124,10 @@ dt_west_pacf <- data.table(quantiles = c(qval),
 all_dat <- rbind(dt_ind, dt_atln, dt_east_pacf, dt_west_pacf)
 all_dat$ocn <- factor(all_dat$ocn, levels = c("Indian", "Atlantic", "East Pacific", "West Pacific"))
 
-ggplot(ind_alt_pacf_meanplot[variable == "IMERG-F" & buyos >= 0.1 & imrg_rf >= 0.1], aes(x = buyos, y = imrg_rf)) +
+plot_precip_days <- ind_alt_pacf_meanplot[variable == "IMERG-F" & buyos >= 0.1 & imrg_rf >= 0.1]
+qq_dat <- plot_precip_days[, .(buyos = sort(buyos), imrg_rf = sort(imrg_rf)), by = 'ocn']
+
+ggplot(plot_precip_days, aes(x = buyos, y = imrg_rf)) +
   geom_bin2d(bins = 50) + 
   labs(x = "Buyos (mm/day)", y = "IMERG (mm/day)") +  
   geom_abline(intercept = 0, slope = 1, col = "black") + 
@@ -138,10 +141,29 @@ ggplot(ind_alt_pacf_meanplot[variable == "IMERG-F" & buyos >= 0.1 & imrg_rf >= 0
              label.size=0, size = 2.5) + 
   theme_very_small + 
   theme(strip.background = element_rect(fill = "white"),
-        strip.text = element_text(colour = 'Black')) + geom_line(aes(buoy, imrg), all_dat, col = "red", type = "dotted")
+        strip.text = element_text(colour = 'Black')) + 
+  geom_line(aes(buyos, imrg_rf), qq_dat, col = "red", type = "dotted")
 
 ggsave("./results/paper_fig/scat_dens_hitdays_imrg_f.png",
        width = 9.9, height = 3.0, units = "in", dpi = 600)
+
+#without log scale
+ggplot(plot_precip_days, aes(x = buyos, y = imrg_rf)) +
+  geom_bin2d(bins = 50) + 
+  labs(x = "Buyos (mm/day)", y = "IMERG (mm/day)") +  
+  geom_abline(intercept = 0, slope = 1, col = "black") + 
+  #scale_fill_continuous(type = "viridis") +  
+  scale_fill_distiller(palette = "Spectral") + 
+  facet_grid(~ocn) + 
+  #scale_x_log10()+scale_y_log10()+
+  coord_cartesian(xlim=c(0.1, 100),ylim=c(0.1,100)) + 
+  geom_label(data = stat_met2,
+             aes(x = 95, y = 0.25, label = lab), label.padding = unit(0.1, "lines"), 
+             label.size=0, size = 2.5) + 
+  theme_very_small + 
+  theme(strip.background = element_rect(fill = "white"),
+        strip.text = element_text(colour = 'Black')) + 
+  geom_line(aes(buyos, imrg_rf), qq_dat, col = "red", type = "dotted")
 
 
 ##########################################################################
